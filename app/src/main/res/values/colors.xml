@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ══ البازلت – الألوان الداكنة الرئيسية ══ -->
+    <color name="basalt_900">#1C1A17</color>
+    <color name="basalt_800">#2D2A25</color>
+    <color name="basalt_700">#3E3A33</color>
+    <color name="basalt_600">#4F4A42</color>
+    <color name="basalt_500">#6B6560</color>
+    <color name="basalt_300">#9E9890</color>
+    <color name="basalt_100">#D6D0C8</color>
+    <color name="basalt_50">#EDE9E2</color>
+
+    <!-- ══ القمح – ألوان التمييز والنداء للفعل ══ -->
+    <color name="wheat_600">#A0731A</color>
+    <color name="wheat_500">#C28B22</color>
+    <color name="wheat_400">#D9A030</color>
+    <color name="wheat_300">#E8B84B</color>
+    <color name="wheat_200">#F0CC7A</color>
+    <color name="wheat_100">#F7E4B0</color>
+    <color name="wheat_50">#FDF5DC</color>
+
+    <!-- ══ الخلفيات والأسطح ══ -->
+    <color name="color_background">#F5F2EC</color>
+    <color name="color_surface">#FFFFFF</color>
+    <color name="color_cream">#F5F2EC</color>
+
+    <!-- ══ حالات الواجهة ══ -->
+    <color name="color_error">#C0392B</color>
+    <color name="color_success">#27AE60</color>
+    <color name="color_info">#2471A3</color>
+
+    <!-- ══ Material Theme ══ -->
+    <color name="colorPrimary">#D9A030</color>
+    <color name="colorPrimaryDark">#2D2A25</color>
+    <color name="colorPrimaryVariant">#A0731A</color>
+    <color name="colorOnPrimary">#1C1A17</color>
+    <color name="colorSecondary">#2D2A25</color>
+    <color name="colorOnSecondary">#E8B84B</color>
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorOnSurface">#1C1A17</color>
+    <color name="colorBackground">#F5F2EC</color>
+    <color name="colorOnBackground">#1C1A17</color>
+    <color name="colorError">#C0392B</color>
+    <color name="colorOnError">#FFFFFF</color>
+
+    <!-- ══ شارات النوع ══ -->
+    <color name="badge_request_bg">#F7E4B0</color>
+    <color name="badge_request_text">#A0731A</color>
+    <color name="badge_offer_bg">#E8F4FD</color>
+    <color name="badge_offer_text">#2471A3</color>
+</resources>
