@@ -36,11 +36,11 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
         ],
       ),
       body: Column(children: [
-        // ── معلومات المستخدم ──────────────────────────────────────────
         Container(
           width: double.infinity,
           color: AppColors.basalt800,
-          padding: const EdgeInsets.fromLTRB(AppDimens.lg, 0, AppDimens.lg, AppDimens.lg),
+          padding: const EdgeInsets.fromLTRB(
+              AppDimens.lg, 0, AppDimens.lg, AppDimens.lg),
           child: Row(children: [
             Container(
               width: 48, height: 48,
@@ -48,16 +48,16 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                 color: AppColors.wheat400,
                 borderRadius: BorderRadius.circular(AppDimens.radiusPill),
               ),
-              child: const Icon(Icons.person, color: AppColors.basalt900, size: 28),
+              child: const Icon(Icons.person,
+                  color: AppColors.basalt900, size: 28),
             ),
             const SizedBox(width: AppDimens.md),
             Text(auth.phoneNumber ?? '',
-              style: const TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontMd,
+              style: const TextStyle(fontFamily: 'Cairo',
+                  fontSize: AppDimens.fontMd,
                   color: AppColors.wheat100, letterSpacing: 1)),
           ]),
         ),
-
-        // ── قائمة منشوراتي ─────────────────────────────────────────────
         Expanded(
           child: Consumer<MyAccountProvider>(
             builder: (context, provider, _) {
@@ -67,17 +67,20 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
               }
               if (provider.myPosts.isEmpty) {
                 return const Center(child: Text(AppStrings.noMyPosts,
-                    style: TextStyle(fontFamily: 'Cairo', color: AppColors.basalt400,
+                    style: TextStyle(fontFamily: 'Cairo',
+                        color: AppColors.basalt400,
                         fontSize: AppDimens.fontLg)));
               }
               return RefreshIndicator(
                 color: AppColors.wheat400,
                 onRefresh: provider.loadMyPosts,
                 child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: AppDimens.sm),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: AppDimens.sm),
                   itemCount: provider.myPosts.length,
                   itemBuilder: (_, i) => _MyPostCard(
-                    post: provider.myPosts[i], provider: provider),
+                    post: provider.myPosts[i],
+                    provider: provider),
                 ),
               );
             },
@@ -96,14 +99,19 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
         content: const Text(AppStrings.confirmLogout,
             style: TextStyle(fontFamily: 'Cairo')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context),
-              child: const Text(AppStrings.cancel,
-                  style: TextStyle(fontFamily: 'Cairo', color: AppColors.basalt500))),
           TextButton(
-            onPressed: () { Navigator.pop(context); auth.logout(); },
+            onPressed: () => Navigator.pop(context),
+            child: const Text(AppStrings.cancel,
+                style: TextStyle(fontFamily: 'Cairo',
+                    color: AppColors.basalt500))),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              auth.logout();
+            },
             child: const Text(AppStrings.logout,
-                style: TextStyle(fontFamily: 'Cairo', color: AppColors.error)),
-          ),
+                style: TextStyle(fontFamily: 'Cairo',
+                    color: AppColors.error))),
         ],
       ),
     );
@@ -121,110 +129,160 @@ class _MyPostCard extends StatelessWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppDimens.cardPadding),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Expanded(child: Text(post.title,
-                style: const TextStyle(fontFamily: 'Cairo',
-                    fontSize: AppDimens.fontMd, fontWeight: FontWeight.w700,
-                    color: AppColors.basalt900))),
-            _StatusBadge(post: post),
-          ]),
-          const SizedBox(height: AppDimens.xs),
-          Text('📍 ${post.region}  •  ${ArabicUtils.timeAgo(post.createdAt.toDate())}',
-            style: const TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontXs,
-                color: AppColors.basalt400)),
-
-          if (post.isActive) ...[
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              Expanded(child: Text(post.title,
+                  style: const TextStyle(fontFamily: 'Cairo',
+                      fontSize: AppDimens.fontMd,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.basalt900))),
+              _StatusBadge(post: post),
+            ]),
             const SizedBox(height: AppDimens.xs),
-            Text(days == 0 ? AppStrings.expiresToday : '$days ${days == 1 ? "يوم متبق" : "أيام متبقية"}',
-              style: TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontXs,
-                  color: days <= 2 ? AppColors.error : AppColors.basalt400)),
+            Text('📍 \${post.region}  •  \${ArabicUtils.timeAgo(post.createdAt.toDate())}',
+              style: const TextStyle(fontFamily: 'Cairo',
+                  fontSize: AppDimens.fontXs,
+                  color: AppColors.basalt400)),
+            if (post.isActive) ...[
+              const SizedBox(height: AppDimens.xs),
+              Text(
+                days == 0
+                    ? AppStrings.expiresToday
+                    : '\$days \${days == 1 ? "يوم متبقي" : "أيام متبقية"}',
+                style: TextStyle(fontFamily: 'Cairo',
+                    fontSize: AppDimens.fontXs,
+                    color: days <= 2 ? AppColors.error : AppColors.basalt400),
+              ),
+            ],
+            const SizedBox(height: AppDimens.sm),
+            if (post.isActive) ...[
+              Row(children: [
+                if (post.canRenew) ...[
+                  _ActionBtn(
+                    label: AppStrings.renew,
+                    color: AppColors.wheat500,
+                    onTap: () async {
+                      final ok = await provider.renewPost(post);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                            ok ? AppStrings.renewOk : AppStrings.errGeneric,
+                            style: const TextStyle(fontFamily: 'Cairo'))));
+                      }
+                    },
+                  ),
+                  const SizedBox(width: AppDimens.sm),
+                ],
+                _ActionBtn(
+                  label: AppStrings.completePost,
+                  color: AppColors.info,
+                  onTap: () async {
+                    final ok = await provider.completePost(post.id);
+                    if (context.mounted && ok) {
+                      _showRatingDialog(context);
+                    }
+                  },
+                ),
+                const SizedBox(width: AppDimens.sm),
+                _ActionBtn(
+                  label: AppStrings.delete,
+                  color: AppColors.error,
+                  onTap: () => _confirmDelete(context),
+                ),
+              ]),
+            ] else ...[
+              _ActionBtn(
+                label: AppStrings.delete,
+                color: AppColors.error,
+                onTap: () => _confirmDelete(context),
+              ),
+            ],
           ],
-
-          const SizedBox(height: AppDimens.sm),
-          // ── أزرار الإجراءات ───────────────────────────────────────
-          if (post.isActive) Row(children: [
-            if (post.canRenew)
-              _ActionBtn(label: AppStrings.renew, color: AppColors.wheat500,
-                onTap: () async {
-                  final ok = await provider.renewPost(post);
-                  if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(ok ? AppStrings.renewOk : AppStrings.errGeneric,
-                        style: const TextStyle(fontFamily: 'Cairo'))));
-                }),
-            if (post.canRenew) const SizedBox(width: AppDimens.sm),
-            _ActionBtn(label: AppStrings.completePost, color: AppColors.info,
-              onTap: () async {
-                final ok = await provider.completePost(post.id);
-                if (context.mounted && ok) _showRatingDialog(context);
-              }),
-            const SizedBox(width: AppDimens.sm),
-            _ActionBtn(label: AppStrings.delete, color: AppColors.error,
-              onTap: () => _confirmDelete(context)),
-          ]),
-          if (!post.isActive) {
-            _ActionBtn(label: AppStrings.delete, color: AppColors.error,
-              onTap: () => _confirmDelete(context)),
-          }
-        ]),
+        ),
       ),
     );
   }
 
   void _confirmDelete(BuildContext context) {
-    showDialog(context: context, builder: (_) => AlertDialog(
-      title: const Text(AppStrings.delete, style: TextStyle(fontFamily: 'Cairo')),
-      content: Text('حذف "${post.title}"؟',
-          style: const TextStyle(fontFamily: 'Cairo')),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context),
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text(AppStrings.delete,
+            style: TextStyle(fontFamily: 'Cairo')),
+        content: Text('حذف "\${post.title}"؟',
+            style: const TextStyle(fontFamily: 'Cairo')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
             child: const Text(AppStrings.cancel,
-                style: TextStyle(fontFamily: 'Cairo', color: AppColors.basalt500))),
-        TextButton(
-          onPressed: () async {
-            Navigator.pop(context);
-            await provider.deletePost(post);
-          },
-          child: const Text(AppStrings.delete,
-              style: TextStyle(fontFamily: 'Cairo', color: AppColors.error)),
-        ),
-      ],
-    ));
+                style: TextStyle(fontFamily: 'Cairo',
+                    color: AppColors.basalt500))),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await provider.deletePost(post);
+            },
+            child: const Text(AppStrings.delete,
+                style: TextStyle(fontFamily: 'Cairo',
+                    color: AppColors.error))),
+        ],
+      ),
+    );
   }
 
   void _showRatingDialog(BuildContext context) {
-    showDialog(context: context, builder: (_) => AlertDialog(
-      title: const Text(AppStrings.ratingTitle,
-          style: TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontMd)),
-      content: const Text(AppStrings.ratingMsg,
-          style: TextStyle(fontFamily: 'Cairo')),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context),
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text(AppStrings.ratingTitle,
+            style: TextStyle(fontFamily: 'Cairo',
+                fontSize: AppDimens.fontMd)),
+        content: const Text(AppStrings.ratingMsg,
+            style: TextStyle(fontFamily: 'Cairo')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
             child: const Text(AppStrings.rateLater,
-                style: TextStyle(fontFamily: 'Cairo', color: AppColors.basalt500))),
-        ElevatedButton(onPressed: () => Navigator.pop(context),
+                style: TextStyle(fontFamily: 'Cairo',
+                    color: AppColors.basalt500))),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
             child: const Text(AppStrings.rateNow,
                 style: TextStyle(fontFamily: 'Cairo'))),
-      ],
-    ));
+        ],
+      ),
+    );
   }
 }
 
 class _ActionBtn extends StatelessWidget {
-  final String label; final Color color; final VoidCallback onTap;
-  const _ActionBtn({required this.label, required this.color, required this.onTap});
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+  const _ActionBtn({
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
   @override
   Widget build(BuildContext context) => GestureDetector(
     onTap: onTap,
     child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppDimens.md, vertical: 5),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppDimens.md, vertical: 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimens.radiusPill),
         border: Border.all(color: color.withValues(alpha: 0.4)),
       ),
-      child: Text(label, style: TextStyle(fontFamily: 'Cairo',
-          fontSize: AppDimens.fontXs, fontWeight: FontWeight.w700, color: color)),
+      child: Text(label,
+        style: TextStyle(fontFamily: 'Cairo',
+            fontSize: AppDimens.fontXs,
+            fontWeight: FontWeight.w700,
+            color: color)),
     ),
   );
 }
@@ -232,17 +290,23 @@ class _ActionBtn extends StatelessWidget {
 class _StatusBadge extends StatelessWidget {
   final PostModel post;
   const _StatusBadge({required this.post});
+
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: AppDimens.sm, vertical: 3),
+    padding: const EdgeInsets.symmetric(
+        horizontal: AppDimens.sm, vertical: 3),
     decoration: BoxDecoration(
       color: post.isActive
-          ? AppColors.badgeRequestBg : AppColors.basalt50,
+          ? AppColors.badgeRequestBg
+          : AppColors.basalt50,
       borderRadius: BorderRadius.circular(AppDimens.radiusPill),
     ),
     child: Text(post.statusLabel,
-      style: TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontXs,
+      style: TextStyle(fontFamily: 'Cairo',
+          fontSize: AppDimens.fontXs,
           fontWeight: FontWeight.w700,
-          color: post.isActive ? AppColors.badgeRequestText : AppColors.basalt400)),
+          color: post.isActive
+              ? AppColors.badgeRequestText
+              : AppColors.basalt400)),
   );
 }
