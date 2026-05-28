@@ -205,7 +205,7 @@ class PostCard extends StatelessWidget {
     final text = '${post.isOffer ? "🛍️ عرض" : "🔍 طلب"}: ${post.title}'
         '${post.details != null ? "\n${post.details!.take(100)}" : ""}'
         '$priceText\n📍 ${post.region}\n\n${AppStrings.shareFooter}';
-    Share.share(text, subject: post.title);
+    SharePlus.instance.share(ShareParams(text: text, subject: post.title));
   }
 
   void _showLoginSnack(BuildContext context) {
