@@ -37,14 +37,30 @@ class _HomeScreenState extends State<HomeScreen> {
               child: CustomPaint(painter: _MiniLogoPainter()),
             ),
             const SizedBox(width: 8),
-            const Text(
-              AppStrings.appName,
-              style: TextStyle(
-                fontFamily:  'Cairo',
-                fontWeight:  FontWeight.w900,
-                color:       AppColors.wheat300,
-                fontSize:    20,
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  AppStrings.appName,
+                  style: TextStyle(
+                    fontFamily:  'Cairo',
+                    fontWeight:  FontWeight.w900,
+                    color:       AppColors.wheat300,
+                    fontSize:    18,
+                    height:      1.1,
+                  ),
+                ),
+                const Text(
+                  AppStrings.appTagline,
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize:   10,
+                    color:      AppColors.basalt300,
+                    height:     1.1,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
