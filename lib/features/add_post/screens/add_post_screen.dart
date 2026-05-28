@@ -79,7 +79,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
             // ── المنطقة ───────────────────────────────────────────────
             DropdownButtonFormField<String>(
-              value: _region,
+              initialValue: _region,
               decoration: const InputDecoration(labelText: AppStrings.postRegion),
               items: AppStrings.regions.skip(1).map((r) =>
                 DropdownMenuItem(value: r, child: Text(r,
