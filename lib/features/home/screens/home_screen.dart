@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_dimens.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../posts/screens/posts_screen.dart';
@@ -23,17 +22,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final auth      = context.watch<AuthProvider>();
+    final auth       = context.watch<AuthProvider>();
     final isLoggedIn = auth.isLoggedIn;
 
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _screens),
-
-      // ── Bottom Navigation ─────────────────────────────────────────────
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (i) {
-          // حساب المستخدم يتطلب تسجيل دخول
           if (i == 1 && !isLoggedIn) {
             _showLoginRequired();
             return;
@@ -41,14 +37,16 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() => _currentIndex = i);
         },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home), label: AppStrings.home),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person), label: AppStrings.myAccount),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
+            label: AppStrings.home),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            activeIcon: Icon(Icons.person),
+            label: AppStrings.myAccount),
         ],
       ),
-
-      // ── FAB (إضافة منشور) ─────────────────────────────────────────────
       floatingActionButton: isLoggedIn
           ? FloatingActionButton(
               onPressed: () => Navigator.push(context,
