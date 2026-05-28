@@ -150,7 +150,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
               Container(
                 padding: const EdgeInsets.all(AppDimens.md),
                 decoration: BoxDecoration(
-                  color:        AppColors.error.withOpacity(0.1),
+                  color:        AppColors.error.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                 ),
                 child: Text(provider.errorMsg!,
