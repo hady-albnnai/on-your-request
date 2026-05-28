@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:share_plus/share_plus.dart' show Share;
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimens.dart';
 import '../../../core/constants/app_strings.dart';
@@ -205,7 +206,7 @@ class PostCard extends StatelessWidget {
     final text = '${post.isOffer ? "🛍️ عرض" : "🔍 طلب"}: ${post.title}'
         '${post.details != null ? "\n${post.details!.take(100)}" : ""}'
         '$priceText\n📍 ${post.region}\n\n${AppStrings.shareFooter}';
-    Share.shareWithResult(text, subject: post.title);
+    Share.share(text, subject: post.title);
   }
 
   void _showLoginSnack(BuildContext context) {
