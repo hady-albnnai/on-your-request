@@ -37,19 +37,21 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text('أدخل رقم هاتفك',
-                  style: TextStyle(fontSize: AppDimens.fontXxl, fontWeight: FontWeight.w700,
-                      color: AppColors.wheat300, fontFamily: 'Cairo')),
+                  style: TextStyle(fontSize: AppDimens.fontXxl,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.wheat300, fontFamily: 'Cairo')),
                 const SizedBox(height: AppDimens.sm),
                 const Text('سنرسل لك رمز تحقق عبر SMS',
-                  style: TextStyle(fontSize: AppDimens.fontMd, color: AppColors.basalt300, fontFamily: 'Cairo')),
+                  style: TextStyle(fontSize: AppDimens.fontMd,
+                    color: AppColors.basalt300, fontFamily: 'Cairo')),
                 const SizedBox(height: AppDimens.xxl),
-
                 TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
                   textDirection: TextDirection.ltr,
-                  style: const TextStyle(color: AppColors.wheat100, fontFamily: 'Cairo',
-                      fontSize: AppDimens.fontLg, letterSpacing: 1),
+                  style: const TextStyle(color: AppColors.wheat100,
+                    fontFamily: 'Cairo', fontSize: AppDimens.fontLg,
+                    letterSpacing: 1),
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: AppColors.basalt700,
@@ -57,16 +59,14 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                     hintStyle: const TextStyle(color: AppColors.basalt400),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-                      borderSide: const BorderSide(color: AppColors.basalt500),
-                    ),
+                      borderSide: const BorderSide(color: AppColors.basalt500)),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-                      borderSide: const BorderSide(color: AppColors.basalt500),
-                    ),
+                      borderSide: const BorderSide(color: AppColors.basalt500)),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-                      borderSide: const BorderSide(color: AppColors.wheat400, width: 2),
-                    ),
+                      borderSide: const BorderSide(
+                        color: AppColors.wheat400, width: 2)),
                   ),
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return 'الرقم مطلوب';
@@ -75,24 +75,22 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                     return null;
                   },
                 ),
-
                 if (auth.errorMsg != null) ...[
                   const SizedBox(height: AppDimens.md),
                   Container(
                     padding: const EdgeInsets.all(AppDimens.md),
                     decoration: BoxDecoration(
-                      color: AppColors.error.withOpacity(0.15),
+                      color: AppColors.error.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-                      border: Border.all(color: AppColors.error.withOpacity(0.4)),
+                      border: Border.all(
+                        color: AppColors.error.withValues(alpha: 0.4)),
                     ),
                     child: Text(auth.errorMsg!,
-                      style: const TextStyle(color: AppColors.error, fontFamily: 'Cairo',
-                          fontSize: AppDimens.fontSm)),
+                      style: const TextStyle(color: AppColors.error,
+                        fontFamily: 'Cairo', fontSize: AppDimens.fontSm)),
                   ),
                 ],
-
                 const Spacer(),
-
                 SizedBox(
                   width: double.infinity,
                   height: AppDimens.btnHeight,
@@ -101,7 +99,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                     child: auth.isLoading
                         ? const SizedBox(width: 22, height: 22,
                             child: CircularProgressIndicator(strokeWidth: 2,
-                                color: AppColors.basalt900))
+                              color: AppColors.basalt900))
                         : const Text(AppStrings.sendCode),
                   ),
                 ),
@@ -119,7 +117,8 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
     await auth.sendVerificationCode(_phoneController.text.trim());
     if (mounted && auth.state == AuthState.success) {
       Navigator.push(context,
-        MaterialPageRoute(builder: (_) => OtpScreen(phone: _phoneController.text.trim())));
+        MaterialPageRoute(builder: (_) =>
+          OtpScreen(phone: _phoneController.text.trim())));
     }
   }
 }
