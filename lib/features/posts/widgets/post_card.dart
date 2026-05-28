@@ -60,7 +60,7 @@ class PostCard extends StatelessWidget {
               const Icon(Icons.location_on_outlined,
                   size: 14, color: AppColors.basalt400),
               const SizedBox(width: 3),
-              Text(post.region,
+              Text(post.fullLocation,
                 style: const TextStyle(fontFamily: 'Cairo',
                     fontSize: AppDimens.fontXs, color: AppColors.basalt400)),
               const SizedBox(width: AppDimens.md),
