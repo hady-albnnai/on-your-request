@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimens.dart';
@@ -43,8 +44,10 @@ class WelcomeScreen extends StatelessWidget {
                 width: double.infinity,
                 height: AppDimens.btnHeight,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const PhoneAuthScreen())),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PhoneAuthScreen()),
+                  ),
                   child: const Text(AppStrings.login),
                 ),
               ),
@@ -57,8 +60,10 @@ class WelcomeScreen extends StatelessWidget {
                     foregroundColor: AppColors.wheat300,
                     side: const BorderSide(color: AppColors.basalt500),
                   ),
-                  onPressed: () => Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (_) => const HomeScreen())),
+                  onPressed: () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const HomeScreen()),
+                  ),
                   child: const Text(AppStrings.browseAsGuest),
                 ),
               ),
@@ -72,7 +77,8 @@ class WelcomeScreen extends StatelessWidget {
 
   Widget _buildLogo() {
     return Container(
-      width: 110, height: 110,
+      width:  110,
+      height: 110,
       decoration: BoxDecoration(
         color:        AppColors.basalt700,
         borderRadius: BorderRadius.circular(AppDimens.radiusXl),
@@ -90,6 +96,7 @@ class _LogoPainter extends CustomPainter {
     final cy = size.height / 2;
     final r  = size.width * 0.38;
 
+    // السداسية
     final hexPaint = Paint()
       ..color       = AppColors.wheat400
       ..style       = PaintingStyle.stroke
@@ -97,26 +104,39 @@ class _LogoPainter extends CustomPainter {
 
     final path = Path();
     for (int i = 0; i < 6; i++) {
-      final angle = (i * 60 - 90) * 3.14159 / 180;
-      final x = cx + r * _cos(angle);
-      final y = cy + r * _sin(angle);
+      final angle = (i * 60 - 90) * math.pi / 180;
+      final x = cx + r * math.cos(angle);
+      final y = cy + r * math.sin(angle);
       i == 0 ? path.moveTo(x, y) : path.lineTo(x, y);
     }
     path.close();
     canvas.drawPath(path, hexPaint);
 
+    // ساق السنبلة
     final stemPaint = Paint()
       ..color       = AppColors.wheat300
       ..strokeWidth = 2
       ..strokeCap   = StrokeCap.round;
-    canvas.drawLine(Offset(cx, cy + r * 0.6), Offset(cx, cy - r * 0.55), stemPaint);
+    canvas.drawLine(
+      Offset(cx, cy + r * 0.6),
+      Offset(cx, cy - r * 0.55),
+      stemPaint,
+    );
 
-    final grainPaint = Paint()..color = AppColors.wheat300..style = PaintingStyle.fill;
+    // حبوب السنبلة
+    final grainPaint = Paint()
+      ..color = AppColors.wheat300
+      ..style = PaintingStyle.fill;
+
     final grains = [
-      [cx - 8.0, cy - 5.0, -0.4],  [cx + 8.0, cy - 5.0,  0.4],
-      [cx - 8.0, cy + 5.0, -0.4],  [cx + 8.0, cy + 5.0,  0.4],
-      [cx - 7.0, cy - 15.0, -0.35],[cx + 7.0, cy - 15.0,  0.35],
+      [cx - 8.0, cy - 5.0,  -0.4],
+      [cx + 8.0, cy - 5.0,   0.4],
+      [cx - 8.0, cy + 5.0,  -0.4],
+      [cx + 8.0, cy + 5.0,   0.4],
+      [cx - 7.0, cy - 15.0, -0.35],
+      [cx + 7.0, cy - 15.0,  0.35],
     ];
+
     for (final g in grains) {
       canvas.save();
       canvas.translate(g[0], g[1]);
@@ -124,17 +144,6 @@ class _LogoPainter extends CustomPainter {
       canvas.drawOval(const Rect.fromLTWH(-5, -3, 10, 6), grainPaint);
       canvas.restore();
     }
-  }
-
-  double _cos(double x) {
-    double result = 1, term = 1;
-    for (int i = 1; i <= 10; i++) { term *= -x * x / (2 * i * (2 * i - 1)); result += term; }
-    return result;
-  }
-  double _sin(double x) {
-    double result = x, term = x;
-    for (int i = 1; i <= 10; i++) { term *= -x * x / ((2 * i + 1) * (2 * i)); result += term; }
-    return result;
   }
 
   @override
