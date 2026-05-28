@@ -15,61 +15,74 @@ class SearchBarWidget extends StatelessWidget {
       color: AppColors.basalt800,
       padding: const EdgeInsets.fromLTRB(
           AppDimens.lg, AppDimens.sm, AppDimens.lg, AppDimens.md),
-      child: Row(children: [
+      child: Column(children: [
         // ── حقل البحث ────────────────────────────────────────────────
-        Expanded(
-          child: SizedBox(
-            height: 42,
-            child: TextField(
-              onChanged: provider.onSearchChanged,
-              textDirection: TextDirection.rtl,
-              style: const TextStyle(fontFamily: 'Cairo',
-                  fontSize: AppDimens.fontSm, color: AppColors.basalt900),
-              decoration: InputDecoration(
-                hintText:   AppStrings.searchHint,
-                hintStyle:  const TextStyle(color: AppColors.basalt400,
-                    fontFamily: 'Cairo', fontSize: AppDimens.fontSm),
-                prefixIcon: const Icon(Icons.search,
-                    color: AppColors.basalt400, size: 20),
-                filled:     true,
-                fillColor:  AppColors.surface,
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: AppDimens.sm, vertical: 0),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-                  borderSide: BorderSide.none,
-                ),
-              ),
+        SizedBox(
+          height: 42,
+          child: TextField(
+            onChanged: provider.onSearchChanged,
+            textDirection: TextDirection.rtl,
+            style: const TextStyle(fontFamily: 'Cairo',
+                fontSize: AppDimens.fontSm, color: AppColors.basalt900),
+            decoration: InputDecoration(
+              hintText:  AppStrings.searchHint,
+              hintStyle: const TextStyle(color: AppColors.basalt400,
+                  fontFamily: 'Cairo', fontSize: AppDimens.fontSm),
+              prefixIcon: const Icon(Icons.search,
+                  color: AppColors.basalt400, size: 20),
+              filled:     true,
+              fillColor:  AppColors.surface,
+              contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppDimens.sm, vertical: 0),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppDimens.radiusSm),
+                borderSide: BorderSide.none),
             ),
           ),
         ),
-        const SizedBox(width: AppDimens.sm),
+        const SizedBox(height: AppDimens.sm),
 
-        // ── فلتر المنطقة ─────────────────────────────────────────────
+        // ── فلتر المنطقة (3 أزرار + جميع المناطق) ───────────────────
         Consumer<PostsProvider>(
-          builder: (context, prov, _) => Container(
-            height: 42,
-            padding: const EdgeInsets.symmetric(horizontal: AppDimens.sm),
-            decoration: BoxDecoration(
-              color:        AppColors.basalt700,
-              borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value:     prov.selectedRegion,
-                dropdownColor: AppColors.basalt800,
-                style:     const TextStyle(fontFamily: 'Cairo',
-                    fontSize: AppDimens.fontXs, color: AppColors.wheat300),
-                icon:      const Icon(Icons.keyboard_arrow_down,
-                    color: AppColors.wheat300, size: 18),
-                items: AppStrings.regions.map((r) =>
-                  DropdownMenuItem(value: r,
-                    child: Text(r, style: const TextStyle(
-                        fontFamily: 'Cairo', fontSize: AppDimens.fontXs,
-                        color: AppColors.wheat300)))).toList(),
-                onChanged: (r) { if (r != null) prov.setRegion(r); },
-              ),
-            ),
+          builder: (context, prov, _) => Row(
+            children: AppStrings.regions.map((r) {
+              final selected = prov.selectedRegion == r;
+              return Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: GestureDetector(
+                    onTap: () => prov.setRegion(r),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      decoration: BoxDecoration(
+                        color: selected
+                            ? AppColors.wheat400
+                            : AppColors.basalt700,
+                        borderRadius:
+                            BorderRadius.circular(AppDimens.radiusSm),
+                        border: Border.all(
+                          color: selected
+                              ? AppColors.wheat400
+                              : AppColors.basalt600),
+                      ),
+                      child: Center(
+                        child: Text(
+                          r == AppStrings.allRegions ? 'الكل' : r,
+                          style: TextStyle(
+                            fontFamily:  'Cairo',
+                            fontSize:    AppDimens.fontXs,
+                            fontWeight:  FontWeight.w700,
+                            color: selected
+                                ? AppColors.basalt900
+                                : AppColors.basalt300,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
           ),
         ),
       ]),
