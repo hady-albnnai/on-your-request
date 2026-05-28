@@ -116,4 +116,8 @@ abstract class AppStrings {
   static const myPosts    = 'منشوراتي';
   static const home       = 'الرئيسية';
   static const search     = 'بحث';
+
+  // ── ثوابت إضافية ────────────────────────────────────────────────────
+  static const expiresToday    = 'ينتهي اليوم';
+  static const daysRemaining   = '%1\$d يوم متبقي';
 }
