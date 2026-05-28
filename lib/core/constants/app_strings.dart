@@ -13,95 +13,20 @@ abstract class AppStrings {
   static const save         = 'حفظ';
   static const close        = 'إغلاق';
 
-  // ── المناطق والبلدات الكاملة في محافظة السويداء ─────────────────────
+  // ── المناطق الرئيسية الثلاث ──────────────────────────────────────────
   static const allRegions = 'جميع المناطق';
   static const regions = [
     'جميع المناطق',
-    // مدينة السويداء
     'السويداء',
-    // قضاء السويداء
-    'أم الزيتون',
-    'القريا',
-    'المزرعة',
-    'الرحى',
-    'الغارية الشرقية',
-    'الغارية الغربية',
-    'بصر الحرير',
-    'تل شهاب',
-    'ذيبين',
-    'سهوة الخضر',
-    'شبكي',
-    'عرمان',
-    'قيصمة',
-    'كناكر',
-    'ملح',
-    'هيت',
-    // قضاء شهبا
-    'شهبا',
-    'أم حوران',
-    'الروم',
-    'السهوة',
-    'القلب',
-    'برة الشام',
-    'تدمر البصل',
-    'حبران',
-    'خربة داوود',
-    'رأس الشهاب',
-    'ريمة',
-    'صميدة',
-    'عمرة',
-    'قنوات',
-    'مسمية الصغيرة',
-    'مسمية الكبيرة',
-    // قضاء صلخد
     'صلخد',
-    'أم الرمان',
-    'الحبارية',
-    'الكفر',
-    'الكوم',
-    'المليحة الشرقية',
-    'المليحة الغربية',
-    'بريكة',
-    'تنبة',
-    'جباب',
-    'خربة غزالة',
-    'دبابين',
-    'رساس',
-    'روضة',
-    'سلمى',
-    'سوار',
-    'شاوا',
-    'شنف',
-    'صلخد البلد',
-    'عرة',
-    'عريقة',
-    'قسم البساتين',
-    'قصر',
-    'كفر عواد',
-    'لجا',
-    'مصيبين',
-    'نجران',
-    // قضاء بصرى (الجزء التابع للسويداء)
-    'بصيري',
-    'أبو حامد',
-    'إياد',
-    'الحراك',
-    'السحمة',
-    'الشيخ مسكين',
-    'جاسم',
-    'دير الشيخ',
-    'ذيبة',
-    'طفس',
-    'عتمان',
-    'غصم',
-    'نمر',
+    'شهبا',
   ];
 
   // ── العملات ─────────────────────────────────────────────────────────
   static const currencySYP = 'SYP';
   static const currencyUSD = 'USD';
   static const symbolSYP   = 'ل.س';
-  static const symbolUSD   = '\$';
+  static const symbolUSD   = r'$';
 
   // ── المصادقة ─────────────────────────────────────────────────────────
   static const enterPhone      = 'أدخل رقم هاتفك';
@@ -122,7 +47,9 @@ abstract class AppStrings {
   static const postTitle       = 'العنوان';
   static const postTitleHint   = 'مثال: مطلوب سباك متمرس…';
   static const postDetails     = 'التفاصيل (اختياري)';
-  static const postRegion      = 'المنطقة';
+  static const postRegion      = 'المنطقة الرئيسية';
+  static const postLocation    = 'الموقع التفصيلي';
+  static const postLocationHint= 'مثال: حي المطار، شارع الجلاء…';
   static const postPrice       = 'السعر';
   static const postCurrency    = 'العملة';
   static const postImage       = 'صورة توضيحية (اختياري)';
@@ -140,7 +67,7 @@ abstract class AppStrings {
   static const noMyPosts       = 'لم تنشر أي منشور بعد';
   static const loadMore        = 'تحميل المزيد';
   static const expiresToday    = 'ينتهي اليوم';
-  static const daysRemaining   = '%1\$d يوم متبقي';
+  static const daysRemaining   = '%1d يوم متبقي';
 
   // ── التواصل ──────────────────────────────────────────────────────────
   static const callPhone       = '📞 اتصال هاتفي';
@@ -158,26 +85,28 @@ abstract class AppStrings {
   static const searchHint      = 'ابحث في السويداء…';
 
   // ── التقييم ──────────────────────────────────────────────────────────
-  static const ratingTitle     = '🎉 شكراً لاستخدامك بخدمتك!';
+  static const ratingTitle     = 'شكراً لاستخدامك بخدمتك!';
   static const ratingMsg       = 'هل أعجبك التطبيق؟ تقييمك يساعدنا على التحسين';
   static const rateNow         = '⭐ تقييم الآن';
   static const rateLater       = 'لاحقاً';
 
   // ── الأخطاء ──────────────────────────────────────────────────────────
-  static const errTitleRequired  = 'العنوان مطلوب';
-  static const errTitleLong      = 'العنوان طويل جداً (100 حرف كحد أقصى)';
-  static const errRegionRequired = 'اختر منطقة محددة';
-  static const errPriceRequired  = 'أدخل سعراً صحيحاً';
-  static const errTimeout        = 'انتهت المهلة، تأكد من اتصالك بالإنترنت';
-  static const errGeneric        = 'حدث خطأ، حاول مرة أخرى';
-  static const errUploadImage    = 'فشل رفع الصورة';
-  static const errNoPhone        = 'لا يمكن الحصول على رقم التواصل';
-  static const errDetails500     = 'التفاصيل طويلة جداً (500 حرف كحد أقصى)';
+  static const errTitleRequired    = 'العنوان مطلوب';
+  static const errTitleLong        = 'العنوان طويل جداً (100 حرف كحد أقصى)';
+  static const errRegionRequired   = 'اختر منطقة رئيسية';
+  static const errLocationRequired = 'الموقع التفصيلي مطلوب';
+  static const errPriceRequired    = 'أدخل سعراً صحيحاً';
+  static const errTimeout          = 'انتهت المهلة، تأكد من اتصالك بالإنترنت';
+  static const errGeneric          = 'حدث خطأ، حاول مرة أخرى';
+  static const errUploadImage      = 'فشل رفع الصورة';
+  static const errNoPhone          = 'لا يمكن الحصول على رقم التواصل';
+  static const errDetails500       = 'التفاصيل طويلة جداً (500 حرف كحد أقصى)';
 
   // ── المشاركة ─────────────────────────────────────────────────────────
   static const shareVia    = 'مشاركة عبر';
   static const shareFooter =
-      'تم النشر في تطبيق "بخدمتك"\nحمّل التطبيق: https://play.google.com/store/apps/details?id=com.onyourrequest';
+      'تم النشر في تطبيق "بخدمتك"'
+      r' – حمّل التطبيق: https://play.google.com/store/apps/details?id=com.onyourrequest';
 
   // ── حسابي ────────────────────────────────────────────────────────────
   static const myAccount  = 'حسابي';
