@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:share_plus/share_plus.dart' show Share;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimens.dart';
 import '../../../core/constants/app_strings.dart';
@@ -26,14 +26,15 @@ class PostCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Header: العنوان + الشارة ──────────────────────────────
+            // ── Header ──────────────────────────────────────────────
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Text(post.title,
                     style: const TextStyle(fontFamily: 'Cairo',
-                        fontSize: AppDimens.fontLg, fontWeight: FontWeight.w700,
+                        fontSize: AppDimens.fontLg,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.basalt900)),
                 ),
                 const SizedBox(width: AppDimens.sm),
@@ -41,7 +42,7 @@ class PostCard extends StatelessWidget {
               ],
             ),
 
-            // ── التفاصيل ──────────────────────────────────────────────
+            // ── التفاصيل ─────────────────────────────────────────────
             if (post.details != null && post.details!.isNotEmpty) ...[
               const SizedBox(height: AppDimens.xs),
               Text(
@@ -49,13 +50,12 @@ class PostCard extends StatelessWidget {
                     ? '${post.details!.substring(0, 80)}...'
                     : post.details!,
                 style: const TextStyle(fontFamily: 'Cairo',
-                    fontSize: AppDimens.fontSm, color: AppColors.basalt500),
-              ),
+                    fontSize: AppDimens.fontSm, color: AppColors.basalt500)),
             ],
 
             const SizedBox(height: AppDimens.sm),
 
-            // ── المنطقة + الوقت ───────────────────────────────────────
+            // ── المنطقة + الوقت ──────────────────────────────────────
             Row(children: [
               const Icon(Icons.location_on_outlined,
                   size: 14, color: AppColors.basalt400),
@@ -72,7 +72,7 @@ class PostCard extends StatelessWidget {
                     fontSize: AppDimens.fontXs, color: AppColors.basalt400)),
             ]),
 
-            // ── السعر (للعروض فقط) ────────────────────────────────────
+            // ── السعر ────────────────────────────────────────────────
             if (post.isOffer && post.price != null) ...[
               const SizedBox(height: AppDimens.xs),
               Text(
@@ -80,13 +80,12 @@ class PostCard extends StatelessWidget {
                 '${post.currency == "USD" ? AppStrings.symbolUSD : AppStrings.symbolSYP}',
                 style: const TextStyle(fontFamily: 'Cairo',
                     fontSize: AppDimens.fontMd, fontWeight: FontWeight.w700,
-                    color: AppColors.wheat600),
-              ),
+                    color: AppColors.wheat600)),
             ],
 
             const Divider(height: AppDimens.lg),
 
-            // ── Footer: عداد الاتصالات + الأزرار ─────────────────────
+            // ── Footer ───────────────────────────────────────────────
             Row(children: [
               const Icon(Icons.phone_outlined,
                   size: 14, color: AppColors.basalt400),
@@ -96,15 +95,29 @@ class PostCard extends StatelessWidget {
                     fontSize: AppDimens.fontXs, color: AppColors.basalt400)),
               const Spacer(),
 
+              // زر التبليغ
+              if (isLoggedIn && !isOwn)
+                IconButton(
+                  icon: const Icon(Icons.flag_outlined,
+                      size: 18, color: AppColors.basalt400),
+                  onPressed: () => _showReportDialog(context, auth.userId!),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  tooltip: AppStrings.report,
+                ),
+
+              const SizedBox(width: AppDimens.sm),
+
               // زر المشاركة
               IconButton(
                 icon: const Icon(Icons.share_outlined,
-                    size: 20, color: AppColors.basalt400),
-                onPressed: () => _sharePost(context),
-                padding: EdgeInsets.zero, constraints: const BoxConstraints(),
+                    size: 18, color: AppColors.basalt400),
+                onPressed: () => _sharePost(),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               ),
 
-              // زر الاتصال (للمسجلين وليس لصاحب المنشور)
+              // زر التواصل
               if (isLoggedIn && !isOwn) ...[
                 const SizedBox(width: AppDimens.md),
                 SizedBox(
@@ -114,31 +127,26 @@ class PostCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: AppDimens.md),
                       minimumSize: Size.zero,
-                      textStyle: const TextStyle(
-                          fontFamily: 'Cairo', fontSize: AppDimens.fontSm,
+                      textStyle: const TextStyle(fontFamily: 'Cairo',
+                          fontSize: AppDimens.fontSm,
                           fontWeight: FontWeight.w700),
                     ),
-                    onPressed: () => _showContactDialog(context),
-                    child: const Text(AppStrings.callPhone == '📞 اتصال هاتفي'
-                        ? 'تواصل' : 'تواصل'),
+                    onPressed: () => _showContactDialog(context, auth.userId!),
+                    child: const Text('تواصل'),
                   ),
                 ),
               ],
 
-              // دعوة للتسجيل (للزوار)
-              if (!isLoggedIn) ...[
-                const SizedBox(width: AppDimens.sm),
+              if (!isLoggedIn)
                 TextButton(
                   onPressed: () => _showLoginSnack(context),
                   style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    minimumSize: Size.zero,
-                  ),
+                      padding: EdgeInsets.zero, minimumSize: Size.zero),
                   child: const Text('سجّل للتواصل',
                     style: TextStyle(fontFamily: 'Cairo',
-                        fontSize: AppDimens.fontXs, color: AppColors.wheat500)),
+                        fontSize: AppDimens.fontXs,
+                        color: AppColors.wheat500)),
                 ),
-              ],
             ]),
           ],
         ),
@@ -146,30 +154,33 @@ class PostCard extends StatelessWidget {
     );
   }
 
-  void _showContactDialog(BuildContext context) {
+  // ── حوار التواصل ──────────────────────────────────────────────────
+  void _showContactDialog(BuildContext context, String currentUserId) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: Text('تواصل بشأن: ${post.title}',
-          style: const TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontMd)),
-        content: null,
+          style: const TextStyle(fontFamily: 'Cairo',
+              fontSize: AppDimens.fontMd)),
         actions: [
           TextButton.icon(
             icon: const Icon(Icons.phone, color: AppColors.wheat600),
             label: const Text(AppStrings.callPhone,
-              style: TextStyle(fontFamily: 'Cairo', color: AppColors.basalt800)),
+              style: TextStyle(fontFamily: 'Cairo',
+                  color: AppColors.basalt800)),
             onPressed: () {
               Navigator.pop(context);
-              _launchPhone(context);
+              _makeCall(context, currentUserId);
             },
           ),
           TextButton.icon(
             icon: const Icon(Icons.chat, color: Colors.green),
             label: const Text(AppStrings.whatsapp,
-              style: TextStyle(fontFamily: 'Cairo', color: AppColors.basalt800)),
+              style: TextStyle(fontFamily: 'Cairo',
+                  color: AppColors.basalt800)),
             onPressed: () {
               Navigator.pop(context);
-              _launchWhatsApp(context);
+              _openWhatsApp(context, currentUserId);
             },
           ),
         ],
@@ -177,60 +188,178 @@ class PostCard extends StatelessWidget {
     );
   }
 
-  Future<void> _launchPhone(BuildContext context) async {
-    // في MVP نعرض رقم وهمي – سيُستبدل بجلب من Firestore
-    final uri = Uri.parse('tel:+963000000000');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
+  // ── جلب رقم الهاتف من Firestore ──────────────────────────────────
+  Future<String?> _getPhoneNumber() async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(post.userId)
+          .get()
+          .timeout(const Duration(seconds: AppDimens.shortTimeoutSecs));
+      return doc.data()?['phoneNumber'] as String?;
+    } catch (_) {
+      return null;
     }
   }
 
-  Future<void> _launchWhatsApp(BuildContext context) async {
-    final uri = Uri.parse('https://api.whatsapp.com/send?phone=963000000000');
+  // ── زيادة العداد ─────────────────────────────────────────────────
+  Future<void> _incrementContact() async {
+    await FirebaseFirestore.instance
+        .collection('posts')
+        .doc(post.id)
+        .update({'contactCount': FieldValue.increment(1)});
+  }
+
+  // ── اتصال هاتفي ──────────────────────────────────────────────────
+  Future<void> _makeCall(BuildContext context, String userId) async {
+    final phone = await _getPhoneNumber();
+    if (phone == null) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(AppStrings.errNoPhone,
+              style: TextStyle(fontFamily: 'Cairo'))));
+      }
+      return;
+    }
+    final uri = Uri.parse('tel:$phone');
     if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      await launchUrl(uri);
+      await _incrementContact();
     } else {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppStrings.noWhatsapp,
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(AppStrings.noPhone,
               style: TextStyle(fontFamily: 'Cairo'))));
       }
     }
   }
 
-  void _sharePost(BuildContext context) {
+  // ── واتساب ───────────────────────────────────────────────────────
+  Future<void> _openWhatsApp(BuildContext context, String userId) async {
+    final phone = await _getPhoneNumber();
+    if (phone == null) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(AppStrings.errNoPhone,
+              style: TextStyle(fontFamily: 'Cairo'))));
+      }
+      return;
+    }
+    final cleaned = phone.replaceAll('+', '').replaceAll(' ', '');
+    final uri = Uri.parse('https://api.whatsapp.com/send?phone=$cleaned');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      await _incrementContact();
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(AppStrings.noWhatsapp,
+              style: TextStyle(fontFamily: 'Cairo'))));
+      }
+    }
+  }
+
+  // ── التبليغ ──────────────────────────────────────────────────────
+  void _showReportDialog(BuildContext context, String reporterId) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text(AppStrings.report,
+            style: TextStyle(fontFamily: 'Cairo')),
+        content: const Text(AppStrings.reportConfirm,
+            style: TextStyle(fontFamily: 'Cairo')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء',
+                style: TextStyle(fontFamily: 'Cairo',
+                    color: AppColors.basalt500))),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _submitReport(context, reporterId);
+            },
+            child: const Text(AppStrings.report,
+                style: TextStyle(fontFamily: 'Cairo',
+                    color: AppColors.error))),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _submitReport(BuildContext context, String reporterId) async {
+    final reportId  = '${post.id}_$reporterId';
+    final reportRef = FirebaseFirestore.instance
+        .collection('reports').doc(reportId);
+    try {
+      final exists = (await reportRef.get()).exists;
+      if (exists) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(AppStrings.alreadyReported,
+                style: TextStyle(fontFamily: 'Cairo'))));
+        }
+        return;
+      }
+      final batch = FirebaseFirestore.instance.batch();
+      batch.update(
+        FirebaseFirestore.instance.collection('posts').doc(post.id),
+        {'reportCount': FieldValue.increment(1)},
+      );
+      batch.set(reportRef, {
+        'postId':     post.id,
+        'reporterId': reporterId,
+        'reportedAt': FieldValue.serverTimestamp(),
+      });
+      await batch.commit();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(AppStrings.reportOk,
+              style: TextStyle(fontFamily: 'Cairo'))));
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(AppStrings.errGeneric,
+              style: TextStyle(fontFamily: 'Cairo'))));
+      }
+    }
+  }
+
+  // ── المشاركة ─────────────────────────────────────────────────────
+  void _sharePost() {
     final priceText = post.isOffer && post.price != null
         ? '\n💰 السعر: ${ArabicUtils.formatPrice(post.price!)} '
           '${post.currency == "USD" ? "\$" : "ل.س"}'
         : '';
-    final text = '${post.isOffer ? "🛍️ عرض" : "🔍 طلب"}: ${post.title}'
-        '${post.details != null ? "\n${post.details!.take(100)}" : ""}'
+    final text =
+        '${post.isOffer ? "🛍️ عرض" : "🔍 طلب"}: ${post.title}'
+        '${post.details != null && post.details!.isNotEmpty ? "\n${post.details!.length > 100 ? post.details!.substring(0, 100) : post.details!}" : ""}'
         '$priceText\n📍 ${post.region}\n\n${AppStrings.shareFooter}';
     Share.share(text, subject: post.title);
   }
 
   void _showLoginSnack(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppStrings.loginRequired,
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text(AppStrings.loginRequired,
           style: TextStyle(fontFamily: 'Cairo'))));
   }
 }
 
-extension on String {
-  String take(int n) => length > n ? substring(0, n) : this;
-}
-
-// ── شارة النوع ─────────────────────────────────────────────────────────
+// ── شارة النوع ────────────────────────────────────────────────────────
 class _TypeBadge extends StatelessWidget {
   final bool isOffer;
   const _TypeBadge({required this.isOffer});
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(
           horizontal: AppDimens.sm, vertical: 3),
       decoration: BoxDecoration(
-        color:        isOffer ? AppColors.badgeOfferBg   : AppColors.badgeRequestBg,
+        color: isOffer
+            ? AppColors.badgeOfferBg
+            : AppColors.badgeRequestBg,
         borderRadius: BorderRadius.circular(AppDimens.radiusPill),
       ),
       child: Text(
@@ -239,7 +368,9 @@ class _TypeBadge extends StatelessWidget {
           fontFamily:  'Cairo',
           fontSize:    AppDimens.fontXs,
           fontWeight:  FontWeight.w700,
-          color: isOffer ? AppColors.badgeOfferText : AppColors.badgeRequestText,
+          color: isOffer
+              ? AppColors.badgeOfferText
+              : AppColors.badgeRequestText,
         ),
       ),
     );
