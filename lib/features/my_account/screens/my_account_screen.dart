@@ -6,7 +6,6 @@ import '../../../core/constants/app_strings.dart';
 import '../../../data/models/post_model.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/my_account_provider.dart';
-import '../../../core/utils/arabic_utils.dart';
 
 class MyAccountScreen extends StatefulWidget {
   const MyAccountScreen({super.key});
