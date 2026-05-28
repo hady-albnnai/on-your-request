@@ -14,29 +14,28 @@ class AddPostProvider extends ChangeNotifier {
   final _db      = FirebaseFirestore.instance;
   final _storage = FirebaseStorage.instance;
 
-  AddPostState _state     = AddPostState.initial;
+  AddPostState _state      = AddPostState.initial;
   String?      _errorMsg;
   bool         _isPublishing = false;
 
   AddPostState get state    => _state;
   String?      get errorMsg => _errorMsg;
-  bool         get isLoading =>
+  bool get isLoading =>
       _state == AddPostState.uploading || _state == AddPostState.publishing;
 
-  /// نشر منشور جديد
   Future<bool> publishPost({
     required String type,
     required String title,
     required String details,
     required String region,
+    required String location,
     double?  price,
     String?  currency,
     File?    imageFile,
   }) async {
-    // ── 1. منع الضغط المتكرر ─────────────────────────────────────────
     if (_isPublishing) return false;
 
-    // ── 2. التحقق من البيانات ─────────────────────────────────────────
+    // ── التحقق من البيانات ─────────────────────────────────────────
     if (title.trim().isEmpty) {
       _setError(AppStrings.errTitleRequired); return false;
     }
@@ -45,6 +44,9 @@ class AddPostProvider extends ChangeNotifier {
     }
     if (region == AppStrings.allRegions) {
       _setError(AppStrings.errRegionRequired); return false;
+    }
+    if (location.trim().isEmpty) {
+      _setError(AppStrings.errLocationRequired); return false;
     }
     if (type == 'offer' && (price == null || price <= 0)) {
       _setError(AppStrings.errPriceRequired); return false;
@@ -58,7 +60,7 @@ class AddPostProvider extends ChangeNotifier {
     String? imageUrl;
     String? storagePath;
 
-    // ── 3. رفع الصورة ────────────────────────────────────────────────
+    // ── رفع الصورة ────────────────────────────────────────────────
     if (imageFile != null) {
       _setState(AddPostState.uploading);
       storagePath = 'posts/$postId/image.jpg';
@@ -69,7 +71,6 @@ class AddPostProvider extends ChangeNotifier {
         imageUrl = await ref.getDownloadURL()
             .timeout(const Duration(seconds: AppDimens.shortTimeoutSecs));
       } catch (_) {
-        // تنظيف الصورة المرفوعة جزئياً
         await ref.delete().catchError((_) {});
         _setError(AppStrings.errUploadImage);
         _isPublishing = false;
@@ -77,16 +78,17 @@ class AddPostProvider extends ChangeNotifier {
       }
     }
 
-    // ── 4. بناء الكلمات المفتاحية ─────────────────────────────────────
-    final keywords = ArabicUtils.buildKeywords(title, details, region);
+    // ── الكلمات المفتاحية (تشمل المنطقة والموقع) ──────────────────
+    final keywords = ArabicUtils.buildKeywords(
+        title, details, '$region $location');
 
-    // ── 5. بيانات المنشور ─────────────────────────────────────────────
-    final prefs   = await SharedPreferences.getInstance();
-    final userId  = prefs.getString('userId') ?? '';
-    final now     = Timestamp.now();
-    final expiry  = Timestamp.fromDate(
-      DateTime.now().add(const Duration(days: AppDimens.postExpiryDays)),
-    );
+    final prefs  = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId') ?? '';
+    final now    = Timestamp.now();
+    final expiry = Timestamp.fromDate(
+      DateTime.now().add(
+          const Duration(days: AppDimens.postExpiryDays)));
+
     final postData = {
       'id':             postId,
       'userId':         userId,
@@ -94,6 +96,7 @@ class AddPostProvider extends ChangeNotifier {
       'title':          title.trim(),
       'details':        details.trim(),
       'region':         region,
+      'location':       location.trim(),
       'price':          price,
       'currency':       currency,
       'imageUrl':       imageUrl,
@@ -106,14 +109,11 @@ class AddPostProvider extends ChangeNotifier {
       'searchKeywords': keywords,
     };
 
-    // ── 6. معاملة Firestore (منع التكرار + كتابة) ────────────────────
+    // ── معاملة Firestore (منع التكرار) ───────────────────────────
     _setState(AddPostState.publishing);
     try {
-      final cutoff = Timestamp.fromDate(
-        DateTime.now().subtract(
-          const Duration(hours: AppDimens.duplicateWindowHrs),
-        ),
-      );
+      final cutoff = Timestamp.fromDate(DateTime.now().subtract(
+          const Duration(hours: AppDimens.duplicateWindowHrs)));
 
       final success = await _db.runTransaction((tx) async {
         final existing = await _db.collection('posts')
@@ -123,9 +123,7 @@ class AddPostProvider extends ChangeNotifier {
             .where('region', isEqualTo: region)
             .where('createdAt', isGreaterThan: cutoff)
             .get();
-
         if (existing.docs.isNotEmpty) return false;
-
         tx.set(_db.collection('posts').doc(postId), postData);
         return true;
       }).timeout(const Duration(seconds: AppDimens.timeoutSeconds));
@@ -135,7 +133,6 @@ class AddPostProvider extends ChangeNotifier {
         _isPublishing = false;
         return true;
       } else {
-        // تكرار – حذف الصورة إن رُفعت
         if (storagePath != null) {
           await _storage.ref(storagePath).delete().catchError((_) {});
         }
@@ -144,7 +141,6 @@ class AddPostProvider extends ChangeNotifier {
         return false;
       }
     } catch (_) {
-      // فشل المعاملة – تنظيف الصورة
       if (storagePath != null) {
         await _storage.ref(storagePath).delete().catchError((_) {});
       }
@@ -154,7 +150,16 @@ class AddPostProvider extends ChangeNotifier {
     }
   }
 
-  void reset() { _state = AddPostState.initial; _errorMsg = null; notifyListeners(); }
+  void reset() {
+    _state = AddPostState.initial;
+    _errorMsg = null;
+    notifyListeners();
+  }
+
   void _setState(AddPostState s) { _state = s; notifyListeners(); }
-  void _setError(String msg)     { _errorMsg = msg; _state = AddPostState.error; notifyListeners(); }
+  void _setError(String msg) {
+    _errorMsg = msg;
+    _state = AddPostState.error;
+    notifyListeners();
+  }
 }
