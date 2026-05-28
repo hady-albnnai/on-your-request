@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── المنشورات ──────────────────────────────────────────────────────
+    match /posts/{postId} {
+      allow read: if true;
+
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == "active"
+        && request.resource.data.title.size() <= 100
+        && request.resource.data.keys().hasAll([
+             "userId","type","title","region",
+             "status","createdAt","expiresAt"
+           ]);
+
+      allow update: if request.auth != null && (
+        (resource.data.userId == request.auth.uid) ||
+        (resource.data.userId != request.auth.uid &&
+         request.resource.data.diff(resource.data)
+           .affectedKeys().hasOnly(["contactCount","reportCount"]))
+      );
+
+      allow delete: if request.auth != null
+        && resource.data.userId == request.auth.uid;
+    }
+
+    // ── المستخدمون ─────────────────────────────────────────────────────
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ── التبليغات ──────────────────────────────────────────────────────
+    match /reports/{reportId} {
+      allow create: if request.auth != null
+        && reportId == request.resource.data.postId + "_" + request.auth.uid
+        && request.resource.data.reporterId == request.auth.uid
+        && request.resource.data.keys().hasAll(["postId","reporterId","reportedAt"]);
+      allow read, update, delete: if false;
+    }
+  }
+}
