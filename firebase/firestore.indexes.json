@@ -25,11 +25,11 @@
       "collectionGroup": "posts",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "type",           "order": "ASCENDING"       },
-        { "fieldPath": "status",         "order": "ASCENDING"       },
-        { "fieldPath": "expiresAt",      "order": "ASCENDING"       },
-        { "fieldPath": "searchKeywords", "arrayConfig": "CONTAINS"  },
-        { "fieldPath": "createdAt",      "order": "DESCENDING"      }
+        { "fieldPath": "type",           "order": "ASCENDING"      },
+        { "fieldPath": "status",         "order": "ASCENDING"      },
+        { "fieldPath": "expiresAt",      "order": "ASCENDING"      },
+        { "fieldPath": "searchKeywords", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "createdAt",      "order": "DESCENDING"     }
       ]
     },
     {
@@ -49,13 +49,6 @@
         { "fieldPath": "title",     "order": "ASCENDING"  },
         { "fieldPath": "region",    "order": "ASCENDING"  },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "reports",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "postId", "order": "ASCENDING" }
       ]
     }
   ],
