@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بخدمتك – هوية بصرية</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    background: #F5F2EC;
+    color: #1C1A17;
+    direction: rtl;
+  }
+
+  /* ═══════════════════════════════════════
+     COLORS
+  ═══════════════════════════════════════ */
+  :root {
+    --basalt-900: #1C1A17;
+    --basalt-800: #2D2A25;
+    --basalt-700: #3E3A33;
+    --basalt-600: #4F4A42;
+    --basalt-500: #6B6560;
+    --basalt-300: #9E9890;
+    --basalt-100: #D6D0C8;
+    --basalt-50:  #EDE9E2;
+
+    --wheat-600:  #A0731A;
+    --wheat-500:  #C28B22;
+    --wheat-400:  #D9A030;
+    --wheat-300:  #E8B84B;
+    --wheat-200:  #F0CC7A;
+    --wheat-100:  #F7E4B0;
+    --wheat-50:   #FDF5DC;
+
+    --cream:      #F5F2EC;
+    --white:      #FFFFFF;
+    --error:      #C0392B;
+    --success:    #27AE60;
+  }
+
+  /* ═══════════════════════════════════════
+     HEADER
+  ═══════════════════════════════════════ */
+  .page-header {
+    background: var(--basalt-800);
+    padding: 32px 24px 24px;
+    text-align: center;
+  }
+  .page-header h1 {
+    color: var(--wheat-300);
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.8;
+  }
+  .page-header h2 {
+    color: var(--white);
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .page-header p {
+    color: var(--basalt-300);
+    font-size: 13px;
+  }
+
+  /* ═══════════════════════════════════════
+     SECTIONS
+  ═══════════════════════════════════════ */
+  .section {
+    max-width: 800px;
+    margin: 28px auto;
+    padding: 0 16px;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--basalt-500);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--basalt-100);
+  }
+
+  /* ═══════════════════════════════════════
+     LOGO PROPOSALS
+  ═══════════════════════════════════════ */
+  .logos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .logo-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 24px 16px;
+    text-align: center;
+    border: 2px solid var(--basalt-100);
+    position: relative;
+  }
+  .logo-card.recommended {
+    border-color: var(--wheat-400);
+    background: var(--wheat-50);
+  }
+  .recommended-badge {
+    position: absolute;
+    top: -10px;
+    right: 12px;
+    background: var(--wheat-400);
+    color: var(--basalt-900);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+  }
+  .logo-card h3 {
+    font-size: 12px;
+    color: var(--basalt-500);
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+  }
+
+  /* Logo A – الحجر البازلتي + السنبلة */
+  .logo-a-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--basalt-800);
+    padding: 12px 18px;
+    border-radius: 14px;
+  }
+  .logo-a-icon {
+    width: 36px;
+    height: 36px;
+    position: relative;
+  }
+  .logo-a-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .logo-a-text span:first-child {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--wheat-300);
+    line-height: 1;
+    letter-spacing: 0.5px;
+  }
+  .logo-a-text span:last-child {
+    font-size: 9px;
+    color: var(--basalt-300);
+    letter-spacing: 1.5px;
+  }
+
+  /* Logo B – دائري */
+  .logo-b-wrap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-b-circle {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--basalt-700), var(--basalt-900));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--wheat-400);
+  }
+  .logo-b-text {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--basalt-800);
+  }
+
+  /* Logo C – مربع */
+  .logo-c-wrap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-c-square {
+    width: 64px;
+    height: 64px;
+    background: var(--wheat-400);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-c-text {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--basalt-800);
+  }
+
+  /* ═══════════════════════════════════════
+     COLOR PALETTE
+  ═══════════════════════════════════════ */
+  .palette-group { margin-bottom: 20px; }
+  .palette-group h4 {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--basalt-500);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+  .palette-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .swatch {
+    flex: 1;
+    min-width: 70px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+  .swatch-color {
+    height: 52px;
+  }
+  .swatch-info {
+    padding: 6px 8px;
+    background: var(--white);
+  }
+  .swatch-info .name {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--basalt-700);
+    display: block;
+  }
+  .swatch-info .hex {
+    font-size: 10px;
+    color: var(--basalt-400);
+    font-family: monospace;
+  }
+
+  /* ═══════════════════════════════════════
+     TYPOGRAPHY
+  ═══════════════════════════════════════ */
+  .type-row {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--basalt-100);
+  }
+  .type-sample { color: var(--basalt-900); }
+  .type-spec {
+    font-size: 11px;
+    color: var(--basalt-400);
+    font-family: monospace;
+    text-align: left;
+  }
+
+  /* ═══════════════════════════════════════
+     MOCKUP – App Screen
+  ═══════════════════════════════════════ */
+  .mockup-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .phone-frame {
+    width: 220px;
+    background: var(--basalt-900);
+    border-radius: 32px;
+    padding: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .phone-screen {
+    background: var(--cream);
+    border-radius: 22px;
+    overflow: hidden;
+    min-height: 420px;
+  }
+
+  /* App Bar */
+  .app-bar {
+    background: var(--basalt-800);
+    padding: 14px 14px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .app-bar-title {
+    color: var(--wheat-300);
+    font-size: 15px;
+    font-weight: 800;
+  }
+  .app-bar-icon {
+    color: var(--basalt-300);
+    font-size: 14px;
+  }
+
+  /* Tabs */
+  .tabs {
+    background: var(--basalt-800);
+    display: flex;
+    border-top: 1px solid var(--basalt-700);
+  }
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 8px 4px;
+    font-size: 11px;
+    color: var(--basalt-400);
+    font-weight: 600;
+  }
+  .tab.active {
+    color: var(--wheat-300);
+    border-bottom: 2px solid var(--wheat-400);
+  }
+
+  /* Search Bar */
+  .search-bar {
+    margin: 10px 10px 6px;
+    background: var(--white);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 11px;
+    color: var(--basalt-400);
+    border: 1px solid var(--basalt-100);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Post Card */
+  .post-card {
+    background: var(--white);
+    margin: 6px 10px;
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid var(--basalt-100);
+  }
+  .post-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+  .post-type-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  .badge-request {
+    background: var(--wheat-100);
+    color: var(--wheat-600);
+  }
+  .badge-offer {
+    background: #E8F4FD;
+    color: #2471A3;
+  }
+  .post-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--basalt-900);
+    margin-bottom: 3px;
+  }
+  .post-region {
+    font-size: 10px;
+    color: var(--basalt-400);
+    margin-bottom: 8px;
+  }
+  .post-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .post-price {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--wheat-600);
+  }
+  .contact-btn {
+    background: var(--wheat-400);
+    color: var(--basalt-900);
+    border: none;
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .contact-count {
+    font-size: 9px;
+    color: var(--basalt-400);
+  }
+
+  /* FAB */
+  .fab {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    width: 40px;
+    height: 40px;
+    background: var(--wheat-400);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--basalt-900);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  }
+  .phone-screen-inner {
+    position: relative;
+    min-height: 360px;
+  }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    display: flex;
+    background: var(--white);
+    border-top: 1px solid var(--basalt-100);
+    padding: 6px 0;
+  }
+  .nav-item {
+    flex: 1;
+    text-align: center;
+    font-size: 9px;
+    color: var(--basalt-400);
+    padding: 4px;
+  }
+  .nav-item.active { color: var(--wheat-500); }
+  .nav-icon { font-size: 16px; display: block; margin-bottom: 2px; }
+
+  /* ═══════════════════════════════════════
+     COMPONENTS
+  ═══════════════════════════════════════ */
+  .components-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .component-card {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 16px;
+    border: 1px solid var(--basalt-100);
+  }
+  .component-card h4 {
+    font-size: 11px;
+    color: var(--basalt-400);
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    font-weight: 700;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    background: var(--wheat-400);
+    color: var(--basalt-900);
+    border: none;
+    border-radius: 10px;
+    padding: 11px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    width: 100%;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--basalt-800);
+    border: 2px solid var(--basalt-200);
+    border-radius: 10px;
+    padding: 9px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    width: 100%;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .btn-danger {
+    background: transparent;
+    color: var(--error);
+    border: 2px solid var(--error);
+    border-radius: 10px;
+    padding: 9px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    width: 100%;
+    cursor: pointer;
+  }
+
+  /* Input */
+  .input-demo {
+    background: var(--cream);
+    border: 1.5px solid var(--basalt-100);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: var(--basalt-900);
+    width: 100%;
+    margin-bottom: 8px;
+    font-family: inherit;
+  }
+  .input-demo:focus {
+    border-color: var(--wheat-400);
+    outline: none;
+  }
+  .input-label {
+    font-size: 11px;
+    color: var(--basalt-500);
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  /* Chips */
+  .chips-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .chip-active { background: var(--wheat-400); color: var(--basalt-900); }
+  .chip-inactive { background: var(--basalt-50); color: var(--basalt-600); border: 1px solid var(--basalt-100); }
+
+  /* Alerts */
+  .alert {
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 12px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .alert-success { background: #EAFAF1; color: #1E8449; border-right: 4px solid var(--success); }
+  .alert-error   { background: #FDEDEC; color: #922B21; border-right: 4px solid var(--error); }
+  .alert-info    { background: var(--wheat-50); color: var(--wheat-600); border-right: 4px solid var(--wheat-400); }
+
+  /* ═══════════════════════════════════════
+     THEME VALUES TABLE
+  ═══════════════════════════════════════ */
+  .theme-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--basalt-100);
+    font-size: 12px;
+  }
+  .theme-table th {
+    background: var(--basalt-800);
+    color: var(--wheat-300);
+    padding: 10px 14px;
+    text-align: right;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .theme-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--basalt-50);
+    color: var(--basalt-700);
+  }
+  .theme-table tr:last-child td { border-bottom: none; }
+  .theme-table tr:nth-child(even) td { background: var(--cream); }
+  .color-dot {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-left: 8px;
+    vertical-align: middle;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+  code {
+    background: var(--basalt-50);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 11px;
+    color: var(--basalt-700);
+  }
+
+  /* ═══════════════════════════════════════
+     FOOTER
+  ═══════════════════════════════════════ */
+  .page-footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--basalt-400);
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  /* SVG Icons inside logos */
+  .wheat-icon { color: var(--wheat-300); }
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══════════════════════════════════════════════════════════ -->
+<div class="page-header">
+  <h1>🎨 الهوية البصرية</h1>
+  <h2>تطبيق "بخدمتك"</h2>
+  <p>ثيم البازلت والقمح · السويداء · MVP v1.0</p>
+</div>
+
+<!-- ══ LOGO PROPOSALS ══════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">🔷 مقترحات اللوغو</div>
+  <div class="logos-grid">
+
+    <!-- A: الأقوى -->
+    <div class="logo-card recommended">
+      <div class="recommended-badge">⭐ مقترح</div>
+      <h3>OPTION A</h3>
+      <div class="logo-a-wrap">
+        <svg class="logo-a-icon" viewBox="0 0 36 36" fill="none">
+          <!-- حجر بازلت سداسي -->
+          <polygon points="18,2 32,10 32,26 18,34 4,26 4,10" fill="#3E3A33" stroke="#D9A030" stroke-width="1.5"/>
+          <!-- سنبلة قمح -->
+          <line x1="18" y1="26" x2="18" y2="10" stroke="#E8B84B" stroke-width="1.5" stroke-linecap="round"/>
+          <ellipse cx="18" cy="13" rx="3" ry="2" fill="#E8B84B" transform="rotate(-20 18 13)"/>
+          <ellipse cx="18" cy="17" rx="3" ry="2" fill="#E8B84B" transform="rotate(20 18 17)"/>
+          <ellipse cx="18" cy="21" rx="3" ry="2" fill="#E8B84B" transform="rotate(-20 18 21)"/>
+        </svg>
+        <div class="logo-a-text">
+          <span>بخدمتك</span>
+          <span>BKHEDMTAK</span>
+        </div>
+      </div>
+      <p style="font-size:11px;color:#6B6560;margin-top:12px;">سداسية البازلت + سنبلة القمح<br>رمز السويداء الأصيل</p>
+    </div>
+
+    <!-- B: دائري -->
+    <div class="logo-card">
+      <h3>OPTION B</h3>
+      <div class="logo-b-wrap">
+        <div class="logo-b-circle">
+          <svg viewBox="0 0 40 40" width="38" height="38" fill="none">
+            <line x1="20" y1="32" x2="20" y2="10" stroke="#E8B84B" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="20" cy="13" rx="4" ry="2.5" fill="#E8B84B" transform="rotate(-25 20 13)"/>
+            <ellipse cx="20" cy="18" rx="4" ry="2.5" fill="#E8B84B" transform="rotate(25 20 18)"/>
+            <ellipse cx="20" cy="23" rx="4" ry="2.5" fill="#E8B84B" transform="rotate(-25 20 23)"/>
+          </svg>
+        </div>
+        <div class="logo-b-text">بخدمتك</div>
+      </div>
+      <p style="font-size:11px;color:#6B6560;margin-top:12px;">دائري + سنبلة فقط<br>بسيط وأنيق</p>
+    </div>
+
+    <!-- C: مربع -->
+    <div class="logo-card">
+      <h3>OPTION C</h3>
+      <div class="logo-c-wrap">
+        <div class="logo-c-square">
+          <svg viewBox="0 0 40 40" width="38" height="38" fill="none">
+            <!-- حرف ب مبسط -->
+            <text x="20" y="28" text-anchor="middle" font-size="22" font-weight="900" fill="#1C1A17" font-family="Arial">ب</text>
+          </svg>
+        </div>
+        <div class="logo-c-text">بخدمتك</div>
+      </div>
+      <p style="font-size:11px;color:#6B6560;margin-top:12px;">حرف "ب" على خلفية قمحية<br>مميز وقابل للتذكر</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ COLOR PALETTE ═══════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">🎨 لوحة الألوان</div>
+
+  <div class="palette-group">
+    <h4>البازلت – Basalt (الألوان الرئيسية الداكنة)</h4>
+    <div class="palette-row">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#1C1A17"></div>
+        <div class="swatch-info"><span class="name">Basalt 900</span><span class="hex">#1C1A17</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#2D2A25"></div>
+        <div class="swatch-info"><span class="name">Basalt 800</span><span class="hex">#2D2A25</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#3E3A33"></div>
+        <div class="swatch-info"><span class="name">Basalt 700</span><span class="hex">#3E3A33</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#6B6560"></div>
+        <div class="swatch-info"><span class="name">Basalt 500</span><span class="hex">#6B6560</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#D6D0C8"></div>
+        <div class="swatch-info"><span class="name">Basalt 100</span><span class="hex">#D6D0C8</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#EDE9E2; border:1px solid #D6D0C8"></div>
+        <div class="swatch-info"><span class="name">Basalt 50</span><span class="hex">#EDE9E2</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="palette-group">
+    <h4>القمح – Wheat (ألوان التمييز والنداء للفعل)</h4>
+    <div class="palette-row">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#A0731A"></div>
+        <div class="swatch-info"><span class="name">Wheat 600</span><span class="hex">#A0731A</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#C28B22"></div>
+        <div class="swatch-info"><span class="name">Wheat 500</span><span class="hex">#C28B22</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#D9A030"></div>
+        <div class="swatch-info"><span class="name">Wheat 400 ★</span><span class="hex">#D9A030</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#E8B84B"></div>
+        <div class="swatch-info"><span class="name">Wheat 300</span><span class="hex">#E8B84B</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#F7E4B0"></div>
+        <div class="swatch-info"><span class="name">Wheat 100</span><span class="hex">#F7E4B0</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#FDF5DC; border:1px solid #F0CC7A"></div>
+        <div class="swatch-info"><span class="name">Wheat 50</span><span class="hex">#FDF5DC</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="palette-group">
+    <h4>الحالات – State Colors</h4>
+    <div class="palette-row">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#F5F2EC; border:1px solid #D6D0C8"></div>
+        <div class="swatch-info"><span class="name">Background</span><span class="hex">#F5F2EC</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#FFFFFF; border:1px solid #D6D0C8"></div>
+        <div class="swatch-info"><span class="name">Surface</span><span class="hex">#FFFFFF</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#27AE60"></div>
+        <div class="swatch-info"><span class="name">Success</span><span class="hex">#27AE60</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#C0392B"></div>
+        <div class="swatch-info"><span class="name">Error</span><span class="hex">#C0392B</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#2471A3"></div>
+        <div class="swatch-info"><span class="name">Info/Offer</span><span class="hex">#2471A3</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MOCKUP ═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">📱 معاينة واجهة التطبيق</div>
+  <div class="mockup-container">
+
+    <!-- الشاشة الرئيسية -->
+    <div>
+      <p style="text-align:center;font-size:11px;color:#6B6560;margin-bottom:8px;">الشاشة الرئيسية</p>
+      <div class="phone-frame">
+        <div class="phone-screen">
+          <div class="app-bar">
+            <span class="app-bar-icon">☰</span>
+            <span class="app-bar-title">بخدمتك</span>
+            <span class="app-bar-icon">🔔</span>
+          </div>
+          <div class="tabs">
+            <div class="tab active">طلبات</div>
+            <div class="tab">عروض</div>
+          </div>
+          <div class="phone-screen-inner">
+            <div class="search-bar">
+              <span>🔍</span>
+              <span>ابحث في السويداء...</span>
+            </div>
+
+            <div class="post-card">
+              <div class="post-card-header">
+                <div>
+                  <div class="post-title">مطلوب سباك محترف</div>
+                  <div class="post-region">📍 السويداء · منذ ساعتين</div>
+                </div>
+                <span class="post-type-badge badge-request">طلب</span>
+              </div>
+              <div class="post-footer">
+                <span class="contact-count">👁 12 تواصل</span>
+                <button class="contact-btn">تواصل</button>
+              </div>
+            </div>
+
+            <div class="post-card">
+              <div class="post-card-header">
+                <div>
+                  <div class="post-title">مطلوب كهربائي منازل</div>
+                  <div class="post-region">📍 شهبا · منذ 5 ساعات</div>
+                </div>
+                <span class="post-type-badge badge-request">طلب</span>
+              </div>
+              <div class="post-footer">
+                <span class="contact-count">👁 8 تواصل</span>
+                <button class="contact-btn">تواصل</button>
+              </div>
+            </div>
+
+            <div class="post-card">
+              <div class="post-card-header">
+                <div>
+                  <div class="post-title">مطلوب سائق خاص</div>
+                  <div class="post-region">📍 صلخد · منذ يوم</div>
+                </div>
+                <span class="post-type-badge badge-request">طلب</span>
+              </div>
+              <div class="post-footer">
+                <span class="contact-count">👁 3 تواصل</span>
+                <button class="contact-btn">تواصل</button>
+              </div>
+            </div>
+
+            <div class="fab">+</div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item active"><span class="nav-icon">🏠</span>الرئيسية</div>
+            <div class="nav-item"><span class="nav-icon">🔍</span>بحث</div>
+            <div class="nav-item"><span class="nav-icon">👤</span>حسابي</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- شاشة عرض -->
+    <div>
+      <p style="text-align:center;font-size:11px;color:#6B6560;margin-bottom:8px;">تبويب العروض</p>
+      <div class="phone-frame">
+        <div class="phone-screen">
+          <div class="app-bar">
+            <span class="app-bar-icon">☰</span>
+            <span class="app-bar-title">بخدمتك</span>
+            <span class="app-bar-icon">🔔</span>
+          </div>
+          <div class="tabs">
+            <div class="tab">طلبات</div>
+            <div class="tab active">عروض</div>
+          </div>
+          <div class="phone-screen-inner">
+            <div class="search-bar">
+              <span>🔍</span>
+              <span>ابحث في السويداء...</span>
+            </div>
+
+            <div class="post-card">
+              <div class="post-card-header">
+                <div>
+                  <div class="post-title">سباك – 10 سنوات خبرة</div>
+                  <div class="post-region">📍 السويداء · منذ ساعة</div>
+                </div>
+                <span class="post-type-badge badge-offer">عرض</span>
+              </div>
+              <div class="post-footer">
+                <span class="post-price">من 50,000 ل.س</span>
+                <button class="contact-btn">تواصل</button>
+              </div>
+            </div>
+
+            <div class="post-card">
+              <div class="post-card-header">
+                <div>
+                  <div class="post-title">كهربائي معتمد</div>
+                  <div class="post-region">📍 السويداء · منذ 3 ساعات</div>
+                </div>
+                <span class="post-type-badge badge-offer">عرض</span>
+              </div>
+              <div class="post-footer">
+                <span class="post-price">من 30,000 ل.س</span>
+                <button class="contact-btn">تواصل</button>
+              </div>
+            </div>
+
+            <div class="post-card">
+              <div class="post-card-header">
+                <div>
+                  <div class="post-title">نجار أثاث منزلي</div>
+                  <div class="post-region">📍 قنوات · منذ يوم</div>
+                </div>
+                <span class="post-type-badge badge-offer">عرض</span>
+              </div>
+              <div class="post-footer">
+                <span class="post-price">حسب الاتفاق</span>
+                <button class="contact-btn">تواصل</button>
+              </div>
+            </div>
+
+            <div class="fab">+</div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item"><span class="nav-icon">🏠</span>الرئيسية</div>
+            <div class="nav-item"><span class="nav-icon">🔍</span>بحث</div>
+            <div class="nav-item"><span class="nav-icon">👤</span>حسابي</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ COMPONENTS ══════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">🧩 مكونات الواجهة</div>
+  <div class="components-grid">
+
+    <div class="component-card">
+      <h4>BUTTONS – الأزرار</h4>
+      <button class="btn-primary">نشر المنشور</button>
+      <button class="btn-secondary">إلغاء</button>
+      <button class="btn-danger">حذف المنشور</button>
+    </div>
+
+    <div class="component-card">
+      <h4>INPUTS – حقول الإدخال</h4>
+      <label class="input-label">عنوان المنشور</label>
+      <input class="input-demo" type="text" placeholder="مثال: مطلوب سباك...">
+      <label class="input-label">المنطقة</label>
+      <input class="input-demo" type="text" placeholder="السويداء">
+    </div>
+
+    <div class="component-card">
+      <h4>CHIPS – الفلاتر</h4>
+      <div class="chips-row">
+        <span class="chip chip-active">الكل</span>
+        <span class="chip chip-inactive">السويداء</span>
+        <span class="chip chip-inactive">شهبا</span>
+        <span class="chip chip-inactive">صلخد</span>
+        <span class="chip chip-inactive">قنوات</span>
+      </div>
+    </div>
+
+    <div class="component-card">
+      <h4>ALERTS – الرسائل</h4>
+      <div class="alert alert-success">✅ تم نشر منشورك بنجاح</div>
+      <div class="alert alert-error">❌ العنوان مطلوب</div>
+      <div class="alert alert-info">⏳ انتهت مهلة الاتصال</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ THEME VALUES TABLE ═══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">📋 قيم الثيم (colors.xml)</div>
+  <table class="theme-table">
+    <tr>
+      <th>المتغير في Kotlin/XML</th>
+      <th>الاستخدام</th>
+      <th>اللون</th>
+    </tr>
+    <tr>
+      <td><code>colorPrimary</code></td>
+      <td>AppBar، FAB، الأزرار الرئيسية</td>
+      <td><span class="color-dot" style="background:#D9A030"></span>#D9A030 (Wheat 400)</td>
+    </tr>
+    <tr>
+      <td><code>colorPrimaryDark</code></td>
+      <td>Status Bar</td>
+      <td><span class="color-dot" style="background:#2D2A25"></span>#2D2A25 (Basalt 800)</td>
+    </tr>
+    <tr>
+      <td><code>colorOnPrimary</code></td>
+      <td>نص فوق اللون الأساسي</td>
+      <td><span class="color-dot" style="background:#1C1A17; border:1px solid #ccc"></span>#1C1A17 (Basalt 900)</td>
+    </tr>
+    <tr>
+      <td><code>colorSurface</code></td>
+      <td>بطاقات المنشورات</td>
+      <td><span class="color-dot" style="background:#FFFFFF; border:1px solid #ccc"></span>#FFFFFF</td>
+    </tr>
+    <tr>
+      <td><code>colorBackground</code></td>
+      <td>خلفية الشاشات</td>
+      <td><span class="color-dot" style="background:#F5F2EC; border:1px solid #ccc"></span>#F5F2EC</td>
+    </tr>
+    <tr>
+      <td><code>colorSecondary</code></td>
+      <td>AppBar خلفية، Header</td>
+      <td><span class="color-dot" style="background:#2D2A25"></span>#2D2A25 (Basalt 800)</td>
+    </tr>
+    <tr>
+      <td><code>colorError</code></td>
+      <td>رسائل الخطأ، زر الحذف</td>
+      <td><span class="color-dot" style="background:#C0392B"></span>#C0392B</td>
+    </tr>
+    <tr>
+      <td><code>badgeRequest</code></td>
+      <td>شارة "طلب"</td>
+      <td><span class="color-dot" style="background:#F7E4B0"></span>#F7E4B0 + نص #A0731A</td>
+    </tr>
+    <tr>
+      <td><code>badgeOffer</code></td>
+      <td>شارة "عرض"</td>
+      <td><span class="color-dot" style="background:#2471A3"></span>#E8F4FD + نص #2471A3</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ══ FOOTER ══════════════════════════════════════════════════════════ -->
+<div class="page-footer">
+  تطبيق "بخدمتك" · السويداء · الهوية البصرية v1.0 · 2026
+</div>
+
+</body>
+</html>
