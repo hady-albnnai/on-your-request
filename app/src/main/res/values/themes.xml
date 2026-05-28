@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- الثيم الأساسي للتطبيق – البازلت والقمح -->
+    <style name="Theme.Bkhedmtak" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- الألوان الرئيسية -->
+        <item name="colorPrimary">@color/wheat_400</item>
+        <item name="colorPrimaryVariant">@color/wheat_600</item>
+        <item name="colorOnPrimary">@color/basalt_900</item>
+
+        <!-- الألوان الثانوية (AppBar, Header) -->
+        <item name="colorSecondary">@color/basalt_800</item>
+        <item name="colorSecondaryVariant">@color/basalt_700</item>
+        <item name="colorOnSecondary">@color/wheat_300</item>
+
+        <!-- الخلفيات -->
+        <item name="android:colorBackground">@color/color_background</item>
+        <item name="colorSurface">@color/color_surface</item>
+        <item name="colorOnSurface">@color/basalt_900</item>
+        <item name="colorOnBackground">@color/basalt_900</item>
+
+        <!-- الأخطاء -->
+        <item name="colorError">@color/color_error</item>
+        <item name="colorOnError">@color/color_surface</item>
+
+        <!-- Status Bar -->
+        <item name="android:statusBarColor">@color/basalt_800</item>
+        <item name="android:windowLightStatusBar">false</item>
+
+        <!-- الخط الافتراضي -->
+        <item name="android:fontFamily">@font/cairo</item>
+    </style>
+
+    <!-- ثيم Splash Screen -->
+    <style name="Theme.Bkhedmtak.Splash" parent="Theme.Bkhedmtak">
+        <item name="android:statusBarColor">@color/basalt_800</item>
+        <item name="android:navigationBarColor">@color/basalt_800</item>
+    </style>
+
+    <!-- AppBar Style -->
+    <style name="Widget.Bkhedmtak.AppBar" parent="Widget.MaterialComponents.AppBarLayout">
+        <item name="android:background">@color/basalt_800</item>
+        <item name="elevation">4dp</item>
+    </style>
+
+    <!-- Toolbar Title -->
+    <style name="Widget.Bkhedmtak.Toolbar.Title" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textColor">@color/wheat_300</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">@font/cairo</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Button Primary -->
+    <style name="Widget.Bkhedmtak.Button.Primary" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/wheat_400</item>
+        <item name="android:textColor">@color/basalt_900</item>
+        <item name="cornerRadius">10dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <!-- Button Secondary -->
+    <style name="Widget.Bkhedmtak.Button.Secondary" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeColor">@color/basalt_100</item>
+        <item name="android:textColor">@color/basalt_800</item>
+        <item name="cornerRadius">10dp</item>
+    </style>
+
+    <!-- Button Danger -->
+    <style name="Widget.Bkhedmtak.Button.Danger" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeColor">@color/color_error</item>
+        <item name="android:textColor">@color/color_error</item>
+        <item name="cornerRadius">10dp</item>
+    </style>
+
+    <!-- Card Style -->
+    <style name="Widget.Bkhedmtak.Card" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/color_surface</item>
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="strokeColor">@color/basalt_100</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <!-- FAB Style -->
+    <style name="Widget.Bkhedmtak.FAB" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="backgroundTint">@color/wheat_400</item>
+        <item name="tint">@color/basalt_900</item>
+    </style>
+
+    <!-- Input Style -->
+    <style name="Widget.Bkhedmtak.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/basalt_100</item>
+        <item name="boxStrokeWidthFocused">2dp</item>
+        <item name="hintTextColor">@color/basalt_500</item>
+        <item name="android:textColorHint">@color/basalt_300</item>
+        <item name="boxBackgroundColor">@color/color_surface</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Bkhedmtak.Input</item>
+    </style>
+
+    <style name="ShapeAppearance.Bkhedmtak.Input" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">10dp</item>
+    </style>
+
+    <!-- BottomNavigationView -->
+    <style name="Widget.Bkhedmtak.BottomNav" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="backgroundTint">@color/color_surface</item>
+        <item name="itemIconTint">@color/nav_item_color</item>
+        <item name="itemTextColor">@color/nav_item_color</item>
+        <item name="elevation">8dp</item>
+    </style>
+
+    <!-- Tab Layout -->
+    <style name="Widget.Bkhedmtak.TabLayout" parent="Widget.MaterialComponents.TabLayout">
+        <item name="android:background">@color/basalt_800</item>
+        <item name="tabTextColor">@color/basalt_400</item>
+        <item name="tabSelectedTextColor">@color/wheat_300</item>
+        <item name="tabIndicatorColor">@color/wheat_400</item>
+        <item name="tabIndicatorHeight">2dp</item>
+    </style>
+</resources>
