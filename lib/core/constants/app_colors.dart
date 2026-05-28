@@ -11,6 +11,7 @@ abstract class AppColors {
   static const basalt500 = Color(0xFF6B6560);
   static const basalt300 = Color(0xFF9E9890);
   static const basalt400 = Color(0xFFB5AFA8);
+  static const basalt200 = Color(0xFFBCB5AC);
   static const basalt100 = Color(0xFFD6D0C8);
   static const basalt50  = Color(0xFFEDE9E2);
 
