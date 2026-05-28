@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'core/constants/app_strings.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/providers/auth_provider.dart';
+import 'features/auth/screens/splash_screen.dart';
 import 'features/auth/screens/welcome_screen.dart';
 import 'features/home/screens/home_screen.dart';
 
@@ -12,20 +13,20 @@ class BkhedmtakApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title:        AppStrings.appName,
+      title:                      AppStrings.appName,
       debugShowCheckedModeBanner: false,
-      theme:        AppTheme.lightTheme,
-      locale:       const Locale('ar', 'SY'),
-      // RTL بالكامل
+      theme:                      AppTheme.lightTheme,
+      locale:                     const Locale('ar', 'SY'),
       builder: (context, child) => Directionality(
         textDirection: TextDirection.rtl,
         child: child!,
       ),
-      // تحديد الشاشة الأولى بناءً على حالة تسجيل الدخول
       home: Consumer<AuthProvider>(
         builder: (context, auth, _) {
-          if (auth.isLoggedIn) return const HomeScreen();
-          return const WelcomeScreen();
+          final nextScreen = auth.isLoggedIn
+              ? const HomeScreen()
+              : const WelcomeScreen();
+          return SplashScreen(nextScreen: nextScreen);
         },
       ),
     );
