@@ -26,11 +26,9 @@ class _PostsScreenState extends State<PostsScreen>
       final type = _tabController.index == 0 ? 'request' : 'offer';
       context.read<PostsProvider>().setType(type);
     });
-    // تحميل أول دفعة
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PostsProvider>().resetAndReload();
     });
-    // تحميل المزيد عند التمرير
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 200) {
@@ -49,50 +47,89 @@ class _PostsScreenState extends State<PostsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.appName),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: AppStrings.requests),
-            Tab(text: AppStrings.offers),
-          ],
-        ),
-      ),
+      // ── بدون AppBar هنا لأنه موجود في HomeScreen ──────────────────
       body: Column(
         children: [
-          // ── شريط البحث والفلتر ────────────────────────────────────────
+          // ── التبويبات ─────────────────────────────────────────────
+          Container(
+            color: AppColors.basalt800,
+            child: TabBar(
+              controller: _tabController,
+              tabs: const [
+                Tab(text: AppStrings.requests),
+                Tab(text: AppStrings.offers),
+              ],
+            ),
+          ),
+
+          // ── شريط البحث والفلتر ────────────────────────────────────
           const SearchBarWidget(),
 
-          // ── قائمة المنشورات ───────────────────────────────────────────
+          // ── قائمة المنشورات ───────────────────────────────────────
           Expanded(
             child: Consumer<PostsProvider>(
               builder: (context, provider, _) {
+
+                // حالة التحميل الأولي
                 if (provider.state == LoadState.loading) {
                   return const Center(
-                    child: CircularProgressIndicator(color: AppColors.wheat400));
+                    child: CircularProgressIndicator(
+                        color: AppColors.wheat400));
                 }
-                if (provider.state == LoadState.error) {
+
+                // حالة الخطأ
+                if (provider.state == LoadState.error &&
+                    provider.posts.isEmpty) {
                   return Center(
-                    child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      Text(provider.errorMsg ?? AppStrings.errGeneric,
-                        style: const TextStyle(color: AppColors.basalt500,
-                            fontFamily: 'Cairo')),
-                      const SizedBox(height: AppDimens.md),
-                      TextButton(
-                        onPressed: provider.resetAndReload,
-                        child: const Text(AppStrings.retry,
-                          style: TextStyle(color: AppColors.wheat500,
-                              fontFamily: 'Cairo'))),
-                    ]),
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppDimens.xl),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.wifi_off_outlined,
+                              size: 48, color: AppColors.basalt300),
+                          const SizedBox(height: AppDimens.md),
+                          Text(
+                            provider.errorMsg ?? AppStrings.errGeneric,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                color: AppColors.basalt500,
+                                fontFamily: 'Cairo',
+                                fontSize: AppDimens.fontMd)),
+                          const SizedBox(height: AppDimens.lg),
+                          ElevatedButton.icon(
+                            onPressed: provider.resetAndReload,
+                            icon: const Icon(Icons.refresh),
+                            label: const Text(AppStrings.retry,
+                                style: TextStyle(fontFamily: 'Cairo')),
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 }
-                if (provider.posts.isEmpty) {
-                  return const Center(
-                    child: Text(AppStrings.noPostsYet,
-                      style: TextStyle(color: AppColors.basalt400,
-                          fontFamily: 'Cairo', fontSize: AppDimens.fontLg)));
+
+                // قائمة فارغة
+                if (provider.posts.isEmpty &&
+                    provider.state == LoadState.success) {
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.inbox_outlined,
+                            size: 56, color: AppColors.basalt200),
+                        const SizedBox(height: AppDimens.md),
+                        const Text(AppStrings.noPostsYet,
+                          style: TextStyle(
+                              color: AppColors.basalt400,
+                              fontFamily: 'Cairo',
+                              fontSize: AppDimens.fontLg)),
+                      ],
+                    ),
+                  );
                 }
+
+                // القائمة الرئيسية
                 return RefreshIndicator(
                   color: AppColors.wheat400,
                   onRefresh: () async => provider.resetAndReload(),
@@ -106,8 +143,10 @@ class _PostsScreenState extends State<PostsScreen>
                       if (i == provider.posts.length) {
                         return const Padding(
                           padding: EdgeInsets.all(AppDimens.lg),
-                          child: Center(child: CircularProgressIndicator(
-                              color: AppColors.wheat400, strokeWidth: 2)));
+                          child: Center(
+                            child: CircularProgressIndicator(
+                                color: AppColors.wheat400,
+                                strokeWidth: 2)));
                       }
                       return PostCard(post: provider.posts[i]);
                     },
