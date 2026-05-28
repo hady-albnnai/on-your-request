@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">بخدمتك</string>
+    <string name="app_name_en">Bkhedmtak</string>
+    <string name="app_tagline">خدماتك بين يديك</string>
+
+    <!-- Auth -->
+    <string name="enter_phone">أدخل رقم هاتفك</string>
+    <string name="phone_hint">+963 9XX XXX XXX</string>
+    <string name="send_code">إرسال رمز التحقق</string>
+    <string name="enter_otp">أدخل رمز التحقق</string>
+    <string name="otp_sent_to">أُرسل الرمز إلى: %1$s</string>
+    <string name="resend_code">إعادة الإرسال</string>
+    <string name="browse_as_guest">تصفح كزائر</string>
+    <string name="login">تسجيل الدخول</string>
+    <string name="logout">تسجيل الخروج</string>
+    <string name="confirm_logout">هل تريد تسجيل الخروج؟</string>
+
+    <!-- Posts -->
+    <string name="requests">طلبات</string>
+    <string name="offers">عروض</string>
+    <string name="add_post">إضافة منشور</string>
+    <string name="post_type">نوع المنشور</string>
+    <string name="post_type_request">طلب خدمة أو منتج</string>
+    <string name="post_type_offer">تقديم خدمة أو منتج</string>
+    <string name="post_title">العنوان</string>
+    <string name="post_title_hint">مثال: مطلوب سباك متمرس…</string>
+    <string name="post_details">التفاصيل (اختياري)</string>
+    <string name="post_region">المنطقة</string>
+    <string name="post_price">السعر</string>
+    <string name="post_currency">العملة</string>
+    <string name="post_image">صورة توضيحية (اختياري)</string>
+    <string name="publish">نشر</string>
+    <string name="publishing">جارٍ النشر…</string>
+    <string name="published_success">✅ تم نشر منشورك بنجاح</string>
+    <string name="duplicate_post">نشرت هذا المنشور مسبقاً خلال آخر 24 ساعة</string>
+    <string name="renew">تجديد</string>
+    <string name="complete">إنهاء الطلب</string>
+    <string name="delete">حذف</string>
+    <string name="confirm_delete">هل تريد حذف \"%1$s\" نهائياً؟</string>
+    <string name="days_remaining">%1$d يوم متبقي</string>
+    <string name="expires_today">ينتهي اليوم</string>
+
+    <!-- Contact -->
+    <string name="contact_options">تواصل بشأن: %1$s</string>
+    <string name="call">📞 اتصال هاتفي</string>
+    <string name="whatsapp">💬 واتساب</string>
+    <string name="no_whatsapp">تطبيق واتساب غير مثبت</string>
+    <string name="contact_count">%1$d تواصل</string>
+
+    <!-- Report -->
+    <string name="report">تبليغ</string>
+    <string name="report_confirm">هل أنت متأكد من تبليغ هذا المنشور كمحتوى مخالف؟</string>
+    <string name="report_success">شكراً، تم التبليغ وسنراجعه قريباً</string>
+    <string name="already_reported">لقد بلّغت عن هذا المنشور مسبقاً</string>
+
+    <!-- Search -->
+    <string name="search_hint">ابحث في السويداء…</string>
+    <string name="all_regions">جميع المناطق</string>
+    <string name="no_posts">لا توجد منشورات حالياً</string>
+    <string name="load_more">تحميل المزيد</string>
+    <string name="loading">جارٍ التحميل…</string>
+
+    <!-- Rating -->
+    <string name="rating_title">🎉 شكراً لاستخدامك بخدمتك!</string>
+    <string name="rating_message">هل أعجبك التطبيق؟ تقييمك يساعدنا على التحسين</string>
+    <string name="rate_now">⭐ تقييم الآن</string>
+    <string name="rate_later">لاحقاً</string>
+    <string name="no_thanks">لا، شكراً</string>
+
+    <!-- Errors -->
+    <string name="error_title_required">العنوان مطلوب</string>
+    <string name="error_title_long">العنوان طويل جداً (100 حرف كحد أقصى)</string>
+    <string name="error_region_required">اختر منطقة محددة</string>
+    <string name="error_price_required">أدخل سعراً صحيحاً</string>
+    <string name="error_timeout">انتهت المهلة، تأكد من اتصالك بالإنترنت</string>
+    <string name="error_generic">حدث خطأ، حاول مرة أخرى</string>
+    <string name="error_upload_image">فشل رفع الصورة</string>
+    <string name="error_phone">لا يمكن الحصول على رقم التواصل</string>
+    <string name="login_required">سجّل دخولك للمتابعة</string>
+
+    <!-- Share -->
+    <string name="share_via">مشاركة عبر</string>
+    <string name="share_footer">تم النشر في تطبيق "بخدمتك"\nحمّل التطبيق: https://play.google.com/store/apps/details?id=com.bkhedmtak</string>
+
+    <!-- My Account -->
+    <string name="my_account">حسابي</string>
+    <string name="my_posts">منشوراتي</string>
+    <string name="no_my_posts">لم تنشر أي منشور بعد</string>
+</resources>
