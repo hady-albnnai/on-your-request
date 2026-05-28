@@ -4,21 +4,22 @@ enum PostType   { request, offer }
 enum PostStatus { active, completed }
 
 class PostModel {
-  final String      id;
-  final String      userId;
-  final PostType    type;
-  final String      title;
-  final String?     details;
-  final String      region;
-  final double?     price;
-  final String?     currency;
-  final String?     imageUrl;
-  final String?     storagePath;   // إلزامي إن وُجدت صورة
-  final PostStatus  status;
-  final Timestamp   createdAt;
-  final Timestamp   expiresAt;
-  final int         contactCount;
-  final int         reportCount;
+  final String       id;
+  final String       userId;
+  final PostType     type;
+  final String       title;
+  final String?      details;
+  final String       region;    // السويداء / صلخد / شهبا
+  final String       location;  // الموقع التفصيلي (إلزامي)
+  final double?      price;
+  final String?      currency;
+  final String?      imageUrl;
+  final String?      storagePath;
+  final PostStatus   status;
+  final Timestamp    createdAt;
+  final Timestamp    expiresAt;
+  final int          contactCount;
+  final int          reportCount;
   final List<String> searchKeywords;
 
   const PostModel({
@@ -28,6 +29,7 @@ class PostModel {
     required this.title,
     this.details,
     required this.region,
+    required this.location,
     this.price,
     this.currency,
     this.imageUrl,
@@ -40,7 +42,6 @@ class PostModel {
     this.searchKeywords = const [],
   });
 
-  // ── من Firestore ──────────────────────────────────────────────────────
   factory PostModel.fromFirestore(DocumentSnapshot doc) {
     final d = doc.data() as Map<String, dynamic>;
     return PostModel(
@@ -50,11 +51,13 @@ class PostModel {
       title:          d['title']        ?? '',
       details:        d['details'],
       region:         d['region']       ?? '',
+      location:       d['location']     ?? '',
       price:          (d['price'] as num?)?.toDouble(),
       currency:       d['currency'],
       imageUrl:       d['imageUrl'],
       storagePath:    d['storagePath'],
-      status:         d['status'] == 'completed' ? PostStatus.completed : PostStatus.active,
+      status:         d['status'] == 'completed'
+          ? PostStatus.completed : PostStatus.active,
       createdAt:      d['createdAt']    ?? Timestamp.now(),
       expiresAt:      d['expiresAt']    ?? Timestamp.now(),
       contactCount:   (d['contactCount'] as num?)?.toInt() ?? 0,
@@ -63,13 +66,13 @@ class PostModel {
     );
   }
 
-  // ── إلى Firestore ──────────────────────────────────────────────────────
   Map<String, dynamic> toFirestore() => {
     'userId':         userId,
     'type':           type == PostType.offer ? 'offer' : 'request',
     'title':          title,
     'details':        details,
     'region':         region,
+    'location':       location,
     'price':          price,
     'currency':       currency,
     'imageUrl':       imageUrl,
@@ -82,7 +85,6 @@ class PostModel {
     'searchKeywords': searchKeywords,
   };
 
-  // ── نسخة معدّلة ────────────────────────────────────────────────────────
   PostModel copyWith({
     PostStatus? status,
     Timestamp?  expiresAt,
@@ -95,32 +97,32 @@ class PostModel {
     title:          title,
     details:        details,
     region:         region,
+    location:       location,
     price:          price,
     currency:       currency,
     imageUrl:       imageUrl,
     storagePath:    storagePath,
-    status:         status         ?? this.status,
+    status:         status       ?? this.status,
     createdAt:      createdAt,
-    expiresAt:      expiresAt      ?? this.expiresAt,
-    contactCount:   contactCount   ?? this.contactCount,
-    reportCount:    reportCount    ?? this.reportCount,
+    expiresAt:      expiresAt    ?? this.expiresAt,
+    contactCount:   contactCount ?? this.contactCount,
+    reportCount:    reportCount  ?? this.reportCount,
     searchKeywords: searchKeywords,
   );
 
-  // ── مساعدات ────────────────────────────────────────────────────────────
   bool get isOffer   => type == PostType.offer;
   bool get isRequest => type == PostType.request;
   bool get isActive  => status == PostStatus.active;
 
-  /// الأيام المتبقية (0 إذا انتهت)
   int get daysRemaining {
     final diff = expiresAt.toDate().difference(DateTime.now());
     return diff.inDays.clamp(0, 999);
   }
 
-  /// هل يمكن التجديد (يومان أو أقل)
-  bool get canRenew => isActive && daysRemaining <= 2;
-
+  bool get canRenew    => isActive && daysRemaining <= 2;
   String get typeLabel   => isOffer ? 'عرض' : 'طلب';
   String get statusLabel => isActive ? 'نشط' : 'مكتمل';
+
+  /// عرض المنطقة + الموقع معاً
+  String get fullLocation => '$region – $location';
 }
