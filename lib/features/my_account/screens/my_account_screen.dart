@@ -136,8 +136,7 @@ class _MyPostCard extends StatelessWidget {
 
           if (post.isActive) ...[
             const SizedBox(height: AppDimens.xs),
-            Text(days == 0 ? AppStrings.expiresToday
-                : '${AppStrings.daysRemaining.replaceFirst('%1\$d', '$days')}',
+            Text(days == 0 ? AppStrings.expiresToday : '$days ${days == 1 ? "يوم متبق" : "أيام متبقية"}',
               style: TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontXs,
                   color: days <= 2 ? AppColors.error : AppColors.basalt400)),
           ],
@@ -163,9 +162,10 @@ class _MyPostCard extends StatelessWidget {
             _ActionBtn(label: AppStrings.delete, color: AppColors.error,
               onTap: () => _confirmDelete(context)),
           ]),
-          if (!post.isActive)
+          if (!post.isActive) {
             _ActionBtn(label: AppStrings.delete, color: AppColors.error,
               onTap: () => _confirmDelete(context)),
+          }
         ]),
       ),
     );
@@ -219,9 +219,9 @@ class _ActionBtn extends StatelessWidget {
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: AppDimens.md, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimens.radiusPill),
-        border: Border.all(color: color.withOpacity(0.4)),
+        border: Border.all(color: color.withValues(alpha: 0.4)),
       ),
       child: Text(label, style: TextStyle(fontFamily: 'Cairo',
           fontSize: AppDimens.fontXs, fontWeight: FontWeight.w700, color: color)),
