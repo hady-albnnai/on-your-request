@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'firebase_options.dart';
 import 'app.dart';
 import 'features/auth/providers/auth_provider.dart';
 import 'features/posts/providers/posts_provider.dart';
@@ -11,14 +12,14 @@ import 'features/my_account/providers/my_account_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // قفل الاتجاه: عمودي فقط
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  // تهيئة Firebase
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(
     MultiProvider(
