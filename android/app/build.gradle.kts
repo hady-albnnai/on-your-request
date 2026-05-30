@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -5,10 +7,10 @@ plugins {
     id("com.google.gms.google-services")
 }
 
-val localProperties = java.util.Properties()
+val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
-    localPropertiesFile.inputStream().use { localProperties.load(it) }
+    localPropertiesFile.inputStream().use { stream -> localProperties.load(stream) }
 }
 
 val flutterVersionCode = localProperties.getProperty("flutter.versionCode") ?: "1"
@@ -22,10 +24,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
     defaultConfig {
