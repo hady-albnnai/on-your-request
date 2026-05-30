@@ -5,6 +5,7 @@ import '../../../core/constants/app_dimens.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../data/models/post_model.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../auth/screens/welcome_screen.dart';
 import '../providers/my_account_provider.dart';
 
 class MyAccountScreen extends StatefulWidget {
@@ -17,13 +18,80 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<MyAccountProvider>().loadMyPosts();
+      final auth = context.read<AuthProvider>();
+      if (auth.isLoggedIn) {
+        context.read<MyAccountProvider>().loadMyPosts();
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+
+    // ── شاشة الزائر ────────────────────────────────────────────────
+    if (!auth.isLoggedIn) {
+      return Scaffold(
+        appBar: AppBar(title: const Text(AppStrings.myAccount)),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppDimens.xl),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 80, height: 80,
+                  decoration: BoxDecoration(
+                    color: AppColors.basalt50,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.basalt100, width: 2),
+                  ),
+                  child: const Icon(Icons.person_outline,
+                      size: 44, color: AppColors.basalt400),
+                ),
+                const SizedBox(height: AppDimens.lg),
+                const Text(
+                  'سجّل دخولك للوصول إلى حسابك',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: AppDimens.fontLg,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.basalt700,
+                  ),
+                ),
+                const SizedBox(height: AppDimens.sm),
+                const Text(
+                  'يمكنك نشر الطلبات والعروض وإدارة منشوراتك',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: AppDimens.fontMd,
+                    color: AppColors.basalt400,
+                  ),
+                ),
+                const SizedBox(height: AppDimens.xl),
+                SizedBox(
+                  width: double.infinity,
+                  height: AppDimens.btnHeight,
+                  child: ElevatedButton.icon(
+                    onPressed: () => Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const WelcomeScreen())),
+                    icon: const Icon(Icons.login),
+                    label: const Text(
+                      AppStrings.login,
+                      style: TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontLg),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    // ── شاشة المستخدم المسجل ─────────────────────────────────────────
     return Scaffold(
       appBar: AppBar(
         title: const Text(AppStrings.myAccount),
@@ -65,10 +133,27 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                     color: AppColors.wheat400));
               }
               if (provider.myPosts.isEmpty) {
-                return const Center(child: Text(AppStrings.noMyPosts,
-                    style: TextStyle(fontFamily: 'Cairo',
-                        color: AppColors.basalt400,
-                        fontSize: AppDimens.fontLg)));
+                return Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.inbox_outlined,
+                          size: 56, color: AppColors.basalt200),
+                      const SizedBox(height: AppDimens.md),
+                      const Text(AppStrings.noMyPosts,
+                          style: TextStyle(fontFamily: 'Cairo',
+                              color: AppColors.basalt400,
+                              fontSize: AppDimens.fontLg)),
+                      const SizedBox(height: AppDimens.lg),
+                      ElevatedButton.icon(
+                        onPressed: provider.loadMyPosts,
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('تحديث',
+                            style: TextStyle(fontFamily: 'Cairo')),
+                      ),
+                    ],
+                  ),
+                );
               }
               return RefreshIndicator(
                 color: AppColors.wheat400,
@@ -140,7 +225,7 @@ class _MyPostCard extends StatelessWidget {
               _StatusBadge(post: post),
             ]),
             const SizedBox(height: AppDimens.xs),
-            Text('📍 \${post.region}  •  \${ArabicUtils.timeAgo(post.createdAt.toDate())}',
+            Text('📍 ${post.fullLocation}',
               style: const TextStyle(fontFamily: 'Cairo',
                   fontSize: AppDimens.fontXs,
                   color: AppColors.basalt400)),
@@ -149,7 +234,7 @@ class _MyPostCard extends StatelessWidget {
               Text(
                 days == 0
                     ? AppStrings.expiresToday
-                    : '\$days \${days == 1 ? "يوم متبقي" : "أيام متبقية"}',
+                    : '$days ${days == 1 ? "يوم متبقي" : "أيام متبقية"}',
                 style: TextStyle(fontFamily: 'Cairo',
                     fontSize: AppDimens.fontXs,
                     color: days <= 2 ? AppColors.error : AppColors.basalt400),
@@ -179,9 +264,7 @@ class _MyPostCard extends StatelessWidget {
                   color: AppColors.info,
                   onTap: () async {
                     final ok = await provider.completePost(post.id);
-                    if (context.mounted && ok) {
-                      _showRatingDialog(context);
-                    }
+                    if (context.mounted && ok) _showRatingDialog(context);
                   },
                 ),
                 const SizedBox(width: AppDimens.sm),
@@ -210,7 +293,7 @@ class _MyPostCard extends StatelessWidget {
       builder: (_) => AlertDialog(
         title: const Text(AppStrings.delete,
             style: TextStyle(fontFamily: 'Cairo')),
-        content: Text('حذف "\${post.title}"؟',
+        content: Text('حذف "${post.title}"؟',
             style: const TextStyle(fontFamily: 'Cairo')),
         actions: [
           TextButton(
@@ -260,11 +343,7 @@ class _ActionBtn extends StatelessWidget {
   final String label;
   final Color color;
   final VoidCallback onTap;
-  const _ActionBtn({
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
+  const _ActionBtn({required this.label, required this.color, required this.onTap});
 
   @override
   Widget build(BuildContext context) => GestureDetector(
@@ -295,9 +374,7 @@ class _StatusBadge extends StatelessWidget {
     padding: const EdgeInsets.symmetric(
         horizontal: AppDimens.sm, vertical: 3),
     decoration: BoxDecoration(
-      color: post.isActive
-          ? AppColors.badgeRequestBg
-          : AppColors.basalt50,
+      color: post.isActive ? AppColors.badgeRequestBg : AppColors.basalt50,
       borderRadius: BorderRadius.circular(AppDimens.radiusPill),
     ),
     child: Text(post.statusLabel,
