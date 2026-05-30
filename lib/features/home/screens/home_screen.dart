@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../auth/screens/welcome_screen.dart';
 import '../../posts/screens/posts_screen.dart';
 import '../../my_account/screens/my_account_screen.dart';
 import '../../add_post/screens/add_post_screen.dart';
@@ -16,11 +17,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  final _screens = const [
-    PostsScreen(),
-    MyAccountScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final auth       = context.watch<AuthProvider>();
@@ -28,7 +24,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        // ── اللوغو في AppBar ──────────────────────────────────────────
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -40,8 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
+              children: const [
+                Text(
                   AppStrings.appName,
                   style: TextStyle(
                     fontFamily:  'Cairo',
@@ -51,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     height:      1.1,
                   ),
                 ),
-                const Text(
+                Text(
                   AppStrings.appTagline,
                   style: TextStyle(
                     fontFamily: 'Cairo',
@@ -65,13 +60,36 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         centerTitle: true,
+        // ── زر تسجيل الدخول للزوار في AppBar ──────────────────────
+        actions: [
+          if (!isLoggedIn)
+            TextButton(
+              onPressed: () => _goToLogin(context),
+              child: const Text(
+                'دخول',
+                style: TextStyle(
+                  fontFamily:  'Cairo',
+                  color:       AppColors.wheat300,
+                  fontWeight:  FontWeight.w700,
+                  fontSize:    14,
+                ),
+              ),
+            ),
+        ],
       ),
-      body: IndexedStack(index: _currentIndex, children: _screens),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: const [
+          PostsScreen(),
+          MyAccountScreen(),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (i) {
           if (i == 1 && !isLoggedIn) {
-            _showLoginRequired();
+            // ── ينقل لشاشة تسجيل الدخول مباشرة ──────────────────
+            _goToLogin(context);
             return;
           }
           setState(() => _currentIndex = i);
@@ -93,18 +111,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 MaterialPageRoute(builder: (_) => const AddPostScreen())),
               child: const Icon(Icons.add, size: 28),
             )
-          : null,
+          : FloatingActionButton.extended(
+              onPressed: () => _goToLogin(context),
+              backgroundColor: AppColors.wheat400,
+              foregroundColor: AppColors.basalt900,
+              icon: const Icon(Icons.login),
+              label: const Text(
+                'سجّل دخولك',
+                style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700),
+              ),
+            ),
     );
   }
 
-  void _showLoginRequired() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(AppStrings.loginRequired,
-          style: TextStyle(fontFamily: 'Cairo')),
-        backgroundColor: AppColors.basalt700,
-        behavior: SnackBarBehavior.floating,
-      ),
+  void _goToLogin(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const WelcomeScreen()),
     );
   }
 }
@@ -117,7 +140,6 @@ class _MiniLogoPainter extends CustomPainter {
     final cy = size.height / 2;
     final r  = size.width * 0.42;
 
-    // السداسية
     final hexPaint = Paint()
       ..color       = AppColors.wheat400
       ..style       = PaintingStyle.stroke
@@ -132,7 +154,6 @@ class _MiniLogoPainter extends CustomPainter {
     path.close();
     canvas.drawPath(path, hexPaint);
 
-    // ساق السنبلة
     final stemPaint = Paint()
       ..color       = AppColors.wheat300
       ..strokeWidth = 1.5
@@ -143,7 +164,6 @@ class _MiniLogoPainter extends CustomPainter {
       stemPaint,
     );
 
-    // حبوب مصغّرة
     final grainPaint = Paint()
       ..color = AppColors.wheat300
       ..style = PaintingStyle.fill;
