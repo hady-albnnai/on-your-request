@@ -19,8 +19,8 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final auth = context.read<AuthProvider>();
-      if (auth.isLoggedIn) {
-        context.read<MyAccountProvider>().loadMyPosts();
+      if (auth.isLoggedIn && auth.userId != null) {
+        context.read<MyAccountProvider>().loadMyPosts(auth.userId!);
       }
     });
   }
@@ -29,69 +29,47 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
 
-    // ── شاشة الزائر ────────────────────────────────────────────────
+    // شاشة الزائر
     if (!auth.isLoggedIn) {
       return Scaffold(
         appBar: AppBar(title: const Text(AppStrings.myAccount)),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(AppDimens.xl),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 80, height: 80,
-                  decoration: BoxDecoration(
-                    color: AppColors.basalt50,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.basalt100, width: 2),
-                  ),
-                  child: const Icon(Icons.person_outline,
-                      size: 44, color: AppColors.basalt400),
-                ),
-                const SizedBox(height: AppDimens.lg),
-                const Text(
-                  'سجّل دخولك للوصول إلى حسابك',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: AppDimens.fontLg,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.basalt700,
-                  ),
-                ),
-                const SizedBox(height: AppDimens.sm),
-                const Text(
-                  'يمكنك نشر الطلبات والعروض وإدارة منشوراتك',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: AppDimens.fontMd,
-                    color: AppColors.basalt400,
-                  ),
-                ),
-                const SizedBox(height: AppDimens.xl),
-                SizedBox(
-                  width: double.infinity,
-                  height: AppDimens.btnHeight,
-                  child: ElevatedButton.icon(
-                    onPressed: () => Navigator.push(context,
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Container(
+                width: 80, height: 80,
+                decoration: BoxDecoration(
+                  color: AppColors.basalt50, shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.basalt100, width: 2)),
+                child: const Icon(Icons.person_outline, size: 44, color: AppColors.basalt400),
+              ),
+              const SizedBox(height: AppDimens.lg),
+              const Text('سجّل دخولك للوصول إلى حسابك',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontLg,
+                    fontWeight: FontWeight.w700, color: AppColors.basalt700)),
+              const SizedBox(height: AppDimens.sm),
+              const Text('يمكنك نشر الطلبات والعروض وإدارة منشوراتك',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontMd,
+                    color: AppColors.basalt400)),
+              const SizedBox(height: AppDimens.xl),
+              SizedBox(width: double.infinity, height: AppDimens.btnHeight,
+                child: ElevatedButton.icon(
+                  onPressed: () => Navigator.push(context,
                       MaterialPageRoute(builder: (_) => const WelcomeScreen())),
-                    icon: const Icon(Icons.login),
-                    label: const Text(
-                      AppStrings.login,
-                      style: TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontLg),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+                  icon: const Icon(Icons.login),
+                  label: const Text(AppStrings.login,
+                      style: TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontLg)),
+                )),
+            ]),
           ),
         ),
       );
     }
 
-    // ── شاشة المستخدم المسجل ─────────────────────────────────────────
+    // شاشة المستخدم المسجل
     return Scaffold(
       appBar: AppBar(
         title: const Text(AppStrings.myAccount),
@@ -103,25 +81,19 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
         ],
       ),
       body: Column(children: [
+        // معلومات المستخدم
         Container(
-          width: double.infinity,
-          color: AppColors.basalt800,
-          padding: const EdgeInsets.fromLTRB(
-              AppDimens.lg, 0, AppDimens.lg, AppDimens.lg),
+          width: double.infinity, color: AppColors.basalt800,
+          padding: const EdgeInsets.fromLTRB(AppDimens.lg, 0, AppDimens.lg, AppDimens.lg),
           child: Row(children: [
             Container(
               width: 48, height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.wheat400,
-                borderRadius: BorderRadius.circular(AppDimens.radiusPill),
-              ),
-              child: const Icon(Icons.person,
-                  color: AppColors.basalt900, size: 28),
-            ),
+              decoration: BoxDecoration(color: AppColors.wheat400,
+                  borderRadius: BorderRadius.circular(AppDimens.radiusPill)),
+              child: const Icon(Icons.person, color: AppColors.basalt900, size: 28)),
             const SizedBox(width: AppDimens.md),
             Text(auth.phoneNumber ?? '',
-              style: const TextStyle(fontFamily: 'Cairo',
-                  fontSize: AppDimens.fontMd,
+              style: const TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontMd,
                   color: AppColors.wheat100, letterSpacing: 1)),
           ]),
         ),
@@ -129,43 +101,30 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           child: Consumer<MyAccountProvider>(
             builder: (context, provider, _) {
               if (provider.isLoading) {
-                return const Center(child: CircularProgressIndicator(
-                    color: AppColors.wheat400));
+                return const Center(child: CircularProgressIndicator(color: AppColors.wheat400));
               }
               if (provider.myPosts.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.inbox_outlined,
-                          size: 56, color: AppColors.basalt200),
-                      const SizedBox(height: AppDimens.md),
-                      const Text(AppStrings.noMyPosts,
-                          style: TextStyle(fontFamily: 'Cairo',
-                              color: AppColors.basalt400,
-                              fontSize: AppDimens.fontLg)),
-                      const SizedBox(height: AppDimens.lg),
-                      ElevatedButton.icon(
-                        onPressed: provider.loadMyPosts,
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('تحديث',
-                            style: TextStyle(fontFamily: 'Cairo')),
-                      ),
-                    ],
-                  ),
-                );
+                return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  const Icon(Icons.inbox_outlined, size: 56, color: AppColors.basalt200),
+                  const SizedBox(height: AppDimens.md),
+                  const Text(AppStrings.noMyPosts,
+                      style: TextStyle(fontFamily: 'Cairo', color: AppColors.basalt400,
+                          fontSize: AppDimens.fontLg)),
+                  const SizedBox(height: AppDimens.lg),
+                  ElevatedButton.icon(
+                    onPressed: () => provider.loadMyPosts(auth.userId!),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('تحديث', style: TextStyle(fontFamily: 'Cairo'))),
+                ]));
               }
               return RefreshIndicator(
                 color: AppColors.wheat400,
-                onRefresh: provider.loadMyPosts,
+                onRefresh: () => provider.loadMyPosts(auth.userId!),
                 child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: AppDimens.sm),
+                  padding: const EdgeInsets.symmetric(vertical: AppDimens.sm),
                   itemCount: provider.myPosts.length,
                   itemBuilder: (_, i) => _MyPostCard(
-                    post: provider.myPosts[i],
-                    provider: provider),
-                ),
+                      post: provider.myPosts[i], provider: provider)),
               );
             },
           ),
@@ -175,30 +134,23 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   }
 
   void _confirmLogout(BuildContext context, AuthProvider auth) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text(AppStrings.logout,
-            style: TextStyle(fontFamily: 'Cairo')),
-        content: const Text(AppStrings.confirmLogout,
-            style: TextStyle(fontFamily: 'Cairo')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
+    showDialog(context: context, builder: (_) => AlertDialog(
+      title: const Text(AppStrings.logout, style: TextStyle(fontFamily: 'Cairo')),
+      content: const Text(AppStrings.confirmLogout, style: TextStyle(fontFamily: 'Cairo')),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context),
             child: const Text(AppStrings.cancel,
-                style: TextStyle(fontFamily: 'Cairo',
-                    color: AppColors.basalt500))),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              auth.logout();
-            },
-            child: const Text(AppStrings.logout,
-                style: TextStyle(fontFamily: 'Cairo',
-                    color: AppColors.error))),
-        ],
-      ),
-    );
+                style: TextStyle(fontFamily: 'Cairo', color: AppColors.basalt500))),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            context.read<MyAccountProvider>().clear();
+            auth.logout();
+          },
+          child: const Text(AppStrings.logout,
+              style: TextStyle(fontFamily: 'Cairo', color: AppColors.error))),
+      ],
+    ));
   }
 }
 
@@ -213,176 +165,126 @@ class _MyPostCard extends StatelessWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppDimens.cardPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(children: [
-              Expanded(child: Text(post.title,
-                  style: const TextStyle(fontFamily: 'Cairo',
-                      fontSize: AppDimens.fontMd,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.basalt900))),
-              _StatusBadge(post: post),
-            ]),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(post.title, style: const TextStyle(fontFamily: 'Cairo',
+                  fontSize: AppDimens.fontMd, fontWeight: FontWeight.w700,
+                  color: AppColors.basalt900)),
+              const SizedBox(height: 2),
+              Text(post.categoryLabel, style: const TextStyle(fontFamily: 'Cairo',
+                  fontSize: AppDimens.fontXs, color: AppColors.wheat600)),
+            ])),
+            _StatusBadge(post: post),
+          ]),
+          const SizedBox(height: AppDimens.xs),
+          Text('📍 ${post.fullLocation}',
+            style: const TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontXs,
+                color: AppColors.basalt400)),
+          if (post.isActive) ...[
             const SizedBox(height: AppDimens.xs),
-            Text('📍 ${post.fullLocation}',
-              style: const TextStyle(fontFamily: 'Cairo',
-                  fontSize: AppDimens.fontXs,
-                  color: AppColors.basalt400)),
-            if (post.isActive) ...[
-              const SizedBox(height: AppDimens.xs),
-              Text(
-                days == 0
-                    ? AppStrings.expiresToday
-                    : '$days ${days == 1 ? "يوم متبقي" : "أيام متبقية"}',
-                style: TextStyle(fontFamily: 'Cairo',
-                    fontSize: AppDimens.fontXs,
-                    color: days <= 2 ? AppColors.error : AppColors.basalt400),
-              ),
-            ],
-            const SizedBox(height: AppDimens.sm),
-            if (post.isActive) ...[
-              Row(children: [
-                if (post.canRenew) ...[
-                  _ActionBtn(
-                    label: AppStrings.renew,
-                    color: AppColors.wheat500,
-                    onTap: () async {
-                      final ok = await provider.renewPost(post);
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text(
-                            ok ? AppStrings.renewOk : AppStrings.errGeneric,
-                            style: const TextStyle(fontFamily: 'Cairo'))));
-                      }
-                    },
-                  ),
-                  const SizedBox(width: AppDimens.sm),
-                ],
-                _ActionBtn(
-                  label: AppStrings.completePost,
-                  color: AppColors.info,
-                  onTap: () async {
-                    final ok = await provider.completePost(post.id);
-                    if (context.mounted && ok) _showRatingDialog(context);
-                  },
-                ),
-                const SizedBox(width: AppDimens.sm),
-                _ActionBtn(
-                  label: AppStrings.delete,
-                  color: AppColors.error,
-                  onTap: () => _confirmDelete(context),
-                ),
-              ]),
-            ] else ...[
-              _ActionBtn(
-                label: AppStrings.delete,
-                color: AppColors.error,
-                onTap: () => _confirmDelete(context),
-              ),
-            ],
+            Text(
+              days == 0 ? AppStrings.expiresToday
+                  : '$days ${days == 1 ? "يوم متبقي" : "أيام متبقية"}',
+              style: TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontXs,
+                  color: days <= 2 ? AppColors.error : AppColors.basalt400)),
           ],
-        ),
+          if (post.price != null) ...[
+            const SizedBox(height: AppDimens.xs),
+            Text('${post.price!.toStringAsFixed(0)} '
+                '${post.currency == "USD" ? r"$" : "ل.س"}',
+              style: const TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontSm,
+                  fontWeight: FontWeight.w700, color: AppColors.wheat600)),
+          ],
+          const SizedBox(height: AppDimens.sm),
+          if (post.isActive) ...[
+            Row(children: [
+              if (post.canRenew) ...[
+                _ActionBtn(label: AppStrings.renew, color: AppColors.wheat500,
+                  onTap: () async {
+                    final ok = await provider.renewPost(post);
+                    if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(ok ? AppStrings.renewOk : AppStrings.errGeneric,
+                          style: const TextStyle(fontFamily: 'Cairo'))));
+                  }),
+                const SizedBox(width: AppDimens.sm),
+              ],
+              _ActionBtn(label: AppStrings.completePost, color: AppColors.info,
+                onTap: () async {
+                  final ok = await provider.completePost(post.id);
+                  if (context.mounted && ok) _showRatingDialog(context);
+                }),
+              const SizedBox(width: AppDimens.sm),
+              _ActionBtn(label: AppStrings.delete, color: AppColors.error,
+                  onTap: () => _confirmDelete(context)),
+            ]),
+          ] else ...[
+            _ActionBtn(label: AppStrings.delete, color: AppColors.error,
+                onTap: () => _confirmDelete(context)),
+          ],
+        ]),
       ),
     );
   }
 
   void _confirmDelete(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text(AppStrings.delete,
-            style: TextStyle(fontFamily: 'Cairo')),
-        content: Text('حذف "${post.title}"؟',
-            style: const TextStyle(fontFamily: 'Cairo')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
+    showDialog(context: context, builder: (_) => AlertDialog(
+      title: const Text(AppStrings.delete, style: TextStyle(fontFamily: 'Cairo')),
+      content: Text('حذف "${post.title}"؟', style: const TextStyle(fontFamily: 'Cairo')),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context),
             child: const Text(AppStrings.cancel,
-                style: TextStyle(fontFamily: 'Cairo',
-                    color: AppColors.basalt500))),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await provider.deletePost(post);
-            },
-            child: const Text(AppStrings.delete,
-                style: TextStyle(fontFamily: 'Cairo',
-                    color: AppColors.error))),
-        ],
-      ),
-    );
+                style: TextStyle(fontFamily: 'Cairo', color: AppColors.basalt500))),
+        TextButton(
+          onPressed: () async { Navigator.pop(context); await provider.deletePost(post); },
+          child: const Text(AppStrings.delete,
+              style: TextStyle(fontFamily: 'Cairo', color: AppColors.error))),
+      ],
+    ));
   }
 
   void _showRatingDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text(AppStrings.ratingTitle,
-            style: TextStyle(fontFamily: 'Cairo',
-                fontSize: AppDimens.fontMd)),
-        content: const Text(AppStrings.ratingMsg,
-            style: TextStyle(fontFamily: 'Cairo')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
+    showDialog(context: context, builder: (_) => AlertDialog(
+      title: const Text(AppStrings.ratingTitle,
+          style: TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontMd)),
+      content: const Text(AppStrings.ratingMsg, style: TextStyle(fontFamily: 'Cairo')),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context),
             child: const Text(AppStrings.rateLater,
-                style: TextStyle(fontFamily: 'Cairo',
-                    color: AppColors.basalt500))),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(AppStrings.rateNow,
-                style: TextStyle(fontFamily: 'Cairo'))),
-        ],
-      ),
-    );
+                style: TextStyle(fontFamily: 'Cairo', color: AppColors.basalt500))),
+        ElevatedButton(onPressed: () => Navigator.pop(context),
+            child: const Text(AppStrings.rateNow, style: TextStyle(fontFamily: 'Cairo'))),
+      ],
+    ));
   }
 }
 
 class _ActionBtn extends StatelessWidget {
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
+  final String label; final Color color; final VoidCallback onTap;
   const _ActionBtn({required this.label, required this.color, required this.onTap});
-
   @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
+  Widget build(BuildContext context) => GestureDetector(onTap: onTap,
     child: Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: AppDimens.md, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimens.md, vertical: 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimens.radiusPill),
-        border: Border.all(color: color.withValues(alpha: 0.4)),
-      ),
-      child: Text(label,
-        style: TextStyle(fontFamily: 'Cairo',
-            fontSize: AppDimens.fontXs,
-            fontWeight: FontWeight.w700,
-            color: color)),
-    ),
-  );
+        border: Border.all(color: color.withValues(alpha: 0.4))),
+      child: Text(label, style: TextStyle(fontFamily: 'Cairo',
+          fontSize: AppDimens.fontXs, fontWeight: FontWeight.w700, color: color)),
+    ));
 }
 
 class _StatusBadge extends StatelessWidget {
   final PostModel post;
   const _StatusBadge({required this.post});
-
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(
-        horizontal: AppDimens.sm, vertical: 3),
+    padding: const EdgeInsets.symmetric(horizontal: AppDimens.sm, vertical: 3),
     decoration: BoxDecoration(
       color: post.isActive ? AppColors.badgeRequestBg : AppColors.basalt50,
-      borderRadius: BorderRadius.circular(AppDimens.radiusPill),
-    ),
-    child: Text(post.statusLabel,
-      style: TextStyle(fontFamily: 'Cairo',
-          fontSize: AppDimens.fontXs,
-          fontWeight: FontWeight.w700,
-          color: post.isActive
-              ? AppColors.badgeRequestText
-              : AppColors.basalt400)),
-  );
+      borderRadius: BorderRadius.circular(AppDimens.radiusPill)),
+    child: Text(post.statusLabel, style: TextStyle(fontFamily: 'Cairo',
+        fontSize: AppDimens.fontXs, fontWeight: FontWeight.w700,
+        color: post.isActive ? AppColors.badgeRequestText : AppColors.basalt400)));
 }
