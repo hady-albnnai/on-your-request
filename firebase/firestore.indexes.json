@@ -25,6 +25,17 @@
       "collectionGroup": "posts",
       "queryScope": "COLLECTION",
       "fields": [
+        { "fieldPath": "category",  "order": "ASCENDING"  },
+        { "fieldPath": "type",      "order": "ASCENDING"  },
+        { "fieldPath": "status",    "order": "ASCENDING"  },
+        { "fieldPath": "expiresAt", "order": "ASCENDING"  },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "posts",
+      "queryScope": "COLLECTION",
+      "fields": [
         { "fieldPath": "type",           "order": "ASCENDING"      },
         { "fieldPath": "status",         "order": "ASCENDING"      },
         { "fieldPath": "expiresAt",      "order": "ASCENDING"      },
@@ -38,17 +49,6 @@
       "fields": [
         { "fieldPath": "userId",    "order": "ASCENDING"  },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "posts",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "region",    "order": "ASCENDING"  },
-        { "fieldPath": "title",     "order": "ASCENDING"  },
-        { "fieldPath": "type",      "order": "ASCENDING"  },
-        { "fieldPath": "userId",    "order": "ASCENDING"  },
-        { "fieldPath": "createdAt", "order": "ASCENDING"  }
       ]
     }
   ],
