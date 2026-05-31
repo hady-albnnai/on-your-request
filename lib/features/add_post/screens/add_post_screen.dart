@@ -21,19 +21,36 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
   String  _type        = 'request';
   String  _region      = 'السويداء';
-  String  _category    = '🌐 أخرى';
+  String  _category    = 'أخرى';
   String  _subCategory = 'أخرى';
   String  _currency    = AppStrings.currencySYP;
   File?   _imageFile;
 
   List<String> get _subCats =>
-      AppStrings.subCategories[_category] ?? ['أخرى'];
+      AppStrings.getSubCategories(_type, _category);
 
   @override
   void dispose() {
     _titleCtrl.dispose(); _detailsCtrl.dispose();
     _priceCtrl.dispose(); _locationCtrl.dispose();
     super.dispose();
+  }
+
+  void _onTypeChanged(String newType) {
+    setState(() {
+      _type = newType;
+      // إعادة ضبط الفئة الفرعية عند تغيير النوع
+      final subs = AppStrings.getSubCategories(newType, _category);
+      _subCategory = subs.first;
+    });
+  }
+
+  void _onCategoryChanged(String newCategory) {
+    setState(() {
+      _category = newCategory;
+      final subs = AppStrings.getSubCategories(_type, newCategory);
+      _subCategory = subs.first;
+    });
   }
 
   @override
@@ -53,11 +70,11 @@ class _AddPostScreenState extends State<AddPostScreen> {
             Row(children: [
               _TypeChip(label: AppStrings.typeRequest,
                 selected: _type == 'request',
-                onTap: () => setState(() => _type = 'request')),
+                onTap: () => _onTypeChanged('request')),
               const SizedBox(width: AppDimens.sm),
               _TypeChip(label: AppStrings.typeOffer,
                 selected: _type == 'offer',
-                onTap: () => setState(() => _type = 'offer')),
+                onTap: () => _onTypeChanged('offer')),
             ]),
             const SizedBox(height: AppDimens.lg),
 
@@ -79,21 +96,15 @@ class _AddPostScreenState extends State<AddPostScreen> {
                       .where((c) => c != AppStrings.allCategories)
                       .map((c) => DropdownMenuItem(value: c,
                           child: Text(c, style: const TextStyle(
-                              fontFamily: 'Cairo',
-                              fontSize: AppDimens.fontMd))))
+                              fontFamily: 'Cairo', fontSize: AppDimens.fontMd))))
                       .toList(),
-                  onChanged: (v) {
-                    if (v != null) setState(() {
-                      _category = v;
-                      _subCategory = AppStrings.subCategories[v]?.first ?? 'أخرى';
-                    });
-                  },
+                  onChanged: (v) { if (v != null) _onCategoryChanged(v); },
                 ),
               ),
             ),
             const SizedBox(height: AppDimens.md),
 
-            // ── الفئة الفرعية ────────────────────────────────────────
+            // ── الفئة الفرعية (حسب النوع) ───────────────────────────
             _SectionLabel(AppStrings.postSubCategory),
             const SizedBox(height: AppDimens.sm),
             Wrap(
@@ -148,7 +159,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
             ),
             const SizedBox(height: AppDimens.md),
 
-            // ── المنطقة الرئيسية ─────────────────────────────────────
+            // ── المنطقة ──────────────────────────────────────────────
             _SectionLabel(AppStrings.postRegion),
             const SizedBox(height: AppDimens.sm),
             Row(children: AppStrings.regions
@@ -220,8 +231,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                   border: Border.all(color: AppColors.basalt100)),
                 child: _imageFile != null
                     ? ClipRRect(
-                        borderRadius:
-                            BorderRadius.circular(AppDimens.radiusMd),
+                        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
                         child: Image.file(_imageFile!,
                             fit: BoxFit.cover, width: double.infinity))
                     : const Column(
@@ -306,7 +316,6 @@ class _AddPostScreenState extends State<AddPostScreen> {
   }
 }
 
-// ── Widgets مساعدة ────────────────────────────────────────────────────
 class _SectionLabel extends StatelessWidget {
   final String text;
   const _SectionLabel(this.text);
