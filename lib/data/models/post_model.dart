@@ -9,8 +9,10 @@ class PostModel {
   final PostType     type;
   final String       title;
   final String?      details;
-  final String       region;    // السويداء / صلخد / شهبا
-  final String       location;  // الموقع التفصيلي (إلزامي)
+  final String       category;      // الفئة الرئيسية
+  final String       subCategory;   // الفئة الفرعية
+  final String       region;
+  final String       location;
   final double?      price;
   final String?      currency;
   final String?      imageUrl;
@@ -28,6 +30,8 @@ class PostModel {
     required this.type,
     required this.title,
     this.details,
+    required this.category,
+    required this.subCategory,
     required this.region,
     required this.location,
     this.price,
@@ -50,6 +54,8 @@ class PostModel {
       type:           d['type'] == 'offer' ? PostType.offer : PostType.request,
       title:          d['title']        ?? '',
       details:        d['details'],
+      category:       d['category']     ?? '🌐 أخرى',
+      subCategory:    d['subCategory']  ?? 'أخرى',
       region:         d['region']       ?? '',
       location:       d['location']     ?? '',
       price:          (d['price'] as num?)?.toDouble(),
@@ -71,6 +77,8 @@ class PostModel {
     'type':           type == PostType.offer ? 'offer' : 'request',
     'title':          title,
     'details':        details,
+    'category':       category,
+    'subCategory':    subCategory,
     'region':         region,
     'location':       location,
     'price':          price,
@@ -96,6 +104,8 @@ class PostModel {
     type:           type,
     title:          title,
     details:        details,
+    category:       category,
+    subCategory:    subCategory,
     region:         region,
     location:       location,
     price:          price,
@@ -119,10 +129,9 @@ class PostModel {
     return diff.inDays.clamp(0, 999);
   }
 
-  bool get canRenew    => isActive && daysRemaining <= 2;
-  String get typeLabel   => isOffer ? 'عرض' : 'طلب';
-  String get statusLabel => isActive ? 'نشط' : 'مكتمل';
-
-  /// عرض المنطقة + الموقع معاً
-  String get fullLocation => '$region – $location';
+  bool   get canRenew      => isActive && daysRemaining <= 2;
+  String get typeLabel     => isOffer ? 'عرض' : 'طلب';
+  String get statusLabel   => isActive ? 'نشط' : 'مكتمل';
+  String get fullLocation  => '$region – $location';
+  String get categoryLabel => '$category › $subCategory';
 }
