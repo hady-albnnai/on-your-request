@@ -46,8 +46,7 @@ class _SplashScreenState extends State<SplashScreen>
                 width: 140, height: 140,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end:   Alignment.bottomRight,
+                    begin: Alignment.topLeft, end: Alignment.bottomRight,
                     colors: [Color(0xFF3E3A33), Color(0xFF2D2A25)],
                   ),
                   borderRadius: BorderRadius.circular(36),
@@ -76,155 +75,159 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
-/// سنبلتا قمح بشكل تاج ذهبي
+/// سنبلتا قمح مقوستان تلتقيان من الأسفل كالتاج
 class WheatCrownPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final cx = size.width  / 2;
-    final cy = size.height / 2 + 4;
+    final cy = size.height / 2 + 6;
 
-    // ── أقلام الرسم ──────────────────────────────────────────────────
-    final stemPaint = Paint()
-      ..style       = PaintingStyle.stroke
-      ..strokeCap   = StrokeCap.round
-      ..strokeWidth = 2.2;
+    // نقطة الالتقاء في الأسفل المنتصف
+    final meetX = cx;
+    final meetY = cy + 26.0;
 
-    final grainFill = Paint()
-      ..style = PaintingStyle.fill;
+    // ── ألوان الحبات ──────────────────────────────────────────────────
+    const colorLight  = Color(0xFFEEC84A);
+    const colorMid    = Color(0xFFD9A030);
+    const colorDark   = Color(0xFFC28B22);
+    const colorAwn    = Color(0xFFF5D87A);
+    const colorStem   = Color(0xFFD4982A);
 
-    final grainStroke = Paint()
-      ..style       = PaintingStyle.stroke
-      ..strokeWidth = 0.7;
+    // ── دالة رسم حبة ناعمة ───────────────────────────────────────────
+    void drawGrain(double x, double y, double angle, double w, double h) {
+      canvas.save();
+      canvas.translate(x, y);
+      canvas.rotate(angle);
+      // حبة ناعمة جداً - بيضاوية مستطيلة ممدودة
+      final grainPath = Path()
+        ..moveTo(0, -h * 0.5)
+        ..cubicTo( w * 0.42, -h * 0.35,  w * 0.42,  h * 0.35,  0,  h * 0.5)
+        ..cubicTo(-w * 0.42,  h * 0.35, -w * 0.42, -h * 0.35,  0, -h * 0.5);
 
-    final awnPaint = Paint()
-      ..style       = PaintingStyle.stroke
-      ..strokeCap   = StrokeCap.round
-      ..strokeWidth = 1.1;
-
-    // ── دالة رسم حبة قمح ─────────────────────────────────────────────
-    void drawGrain(Canvas c, double x, double y, double angle,
-        double w, double h, Color fill, Color stroke) {
-      c.save();
-      c.translate(x, y);
-      c.rotate(angle);
-      final p = Path()
-        ..moveTo(0, -h / 2)
-        ..cubicTo( w * 0.55, -h * 0.25,  w * 0.55,  h * 0.25,  0,  h / 2)
-        ..cubicTo(-w * 0.55,  h * 0.25, -w * 0.55, -h * 0.25,  0, -h / 2);
-      c.drawPath(p, grainFill..color = fill);
-      c.drawPath(p, grainStroke..color = stroke);
-      // خط وسط
-      c.drawLine(Offset(0, -h * 0.3), Offset(0, h * 0.3),
-          Paint()..color = stroke..strokeWidth = 0.5);
-      c.restore();
+      // تعبئة متدرجة
+      canvas.drawPath(grainPath,
+          Paint()..color = colorLight..style = PaintingStyle.fill);
+      // ظل داخلي
+      canvas.drawPath(grainPath,
+          Paint()..color = colorDark..style = PaintingStyle.stroke..strokeWidth = 0.6);
+      // خط وسط ناعم
+      canvas.drawLine(Offset(0, -h * 0.28), Offset(0, h * 0.28),
+          Paint()..color = colorMid..strokeWidth = 0.5
+              ..style = PaintingStyle.stroke..strokeCap = StrokeCap.round);
+      canvas.restore();
     }
 
-    // ── دالة رسم سنبلة كاملة ─────────────────────────────────────────
-    void drawWheatStalk(Canvas c, double baseX, double baseY,
-        double stemAngle, double spread, bool mirrorAwns) {
-      // الساق
-      final stemLen = 52.0;
-      final topX = baseX + math.sin(stemAngle) * stemLen;
-      final topY = baseY - math.cos(stemAngle) * stemLen;
+    // ── دالة رسم شارب (awn) ──────────────────────────────────────────
+    void drawAwn(double x, double y, double angle, double len) {
+      canvas.save();
+      canvas.translate(x, y);
+      canvas.rotate(angle);
+      canvas.drawLine(
+        Offset(0, 0), Offset(0, -len),
+        Paint()..color = colorAwn..strokeWidth = 0.9
+            ..strokeCap = StrokeCap.round..style = PaintingStyle.stroke,
+      );
+      canvas.restore();
+    }
 
-      stemPaint.color = AppColors.wheat500;
+    // ── دالة رسم سنبلة مقوسة ─────────────────────────────────────────
+    void drawCurvedStalk({
+      required bool isLeft,
+    }) {
+      // نقطة البداية (الالتقاء)
+      final x0 = meetX;
+      final y0 = meetY;
+
+      // نقطة النهاية (القمة)
+      final topX = isLeft ? cx - 30.0 : cx + 30.0;
+      final topY = cy - 38.0;
+
+      // نقطة تحكم القوس - تعطي الانحناء الطبيعي للسنبلة
+      final ctrlX = isLeft ? cx - 28.0 : cx + 28.0;
+      final ctrlY = cy + 2.0;
+
+      // رسم الساق المقوسة
       final stemPath = Path()
-        ..moveTo(baseX, baseY)
-        ..quadraticBezierTo(
-          baseX + math.sin(stemAngle) * stemLen * 0.5 + (mirrorAwns ? -3 : 3),
-          baseY - math.cos(stemAngle) * stemLen * 0.5,
-          topX, topY,
-        );
-      c.drawPath(stemPath, stemPaint);
+        ..moveTo(x0, y0)
+        ..quadraticBezierTo(ctrlX, ctrlY, topX, topY);
 
-      // الحبات على السنبلة (5 أزواج + قمة)
-      const grains = 5;
-      for (int i = 0; i < grains; i++) {
-        final t  = (i + 1) / (grains + 1);
-        final gx = baseX + math.sin(stemAngle) * stemLen * t;
-        final gy = baseY - math.cos(stemAngle) * stemLen * t;
+      canvas.drawPath(stemPath,
+          Paint()..color = colorStem..strokeWidth = 2.0
+              ..strokeCap = StrokeCap.round..style = PaintingStyle.stroke);
 
-        final gAngle = stemAngle + (mirrorAwns ? spread : -spread) * (1 - t * 0.3);
-        final gAngleOpp = stemAngle + (mirrorAwns ? -spread : spread) * (1 - t * 0.3);
+      // ── وضع الحبات على طول المنحنى ───────────────────────────────
+      // نحسب نقاطاً على المنحنى ونرسم الحبات عليها
+      const numGrains = 5;
+      for (int i = 0; i < numGrains; i++) {
+        final t  = (i + 1) / (numGrains + 1.0);
+        final mt = 1 - t;
 
-        final gw = 7.0 - i * 0.4;
-        final gh = 11.0 - i * 0.5;
+        // نقطة على المنحنى Bezier
+        final gx = mt * mt * x0 + 2 * mt * t * ctrlX + t * t * topX;
+        final gy = mt * mt * y0 + 2 * mt * t * ctrlY + t * t * topY;
 
-        // حبة يمين
-        drawGrain(c,
-          gx + math.sin(gAngle) * (gw + 2),
-          gy - math.cos(gAngle) * 1,
-          gAngle, gw, gh,
-          const Color(0xFFE8B84B), const Color(0xFFC28B22));
+        // المماس (اتجاه الساق) لتوجيه الحبات
+        final tx2 = 2 * mt * (ctrlX - x0) + 2 * t * (topX - ctrlX);
+        final ty2 = 2 * mt * (ctrlY - y0) + 2 * t * (topY - ctrlY);
+        final stemAngle = math.atan2(tx2, -ty2);
 
-        // حبة يسار
-        drawGrain(c,
-          gx + math.sin(gAngleOpp) * (gw + 2),
-          gy - math.cos(gAngleOpp) * 1,
-          gAngleOpp, gw, gh,
-          const Color(0xFFD9A030), const Color(0xFFA0731A));
+        // زاوية عمودية على الساق لوضع الحبات
+        final perpAngle = stemAngle + math.pi / 2;
 
-        // شوارب (awns)
-        final awnLen = 9.0 - i * 0.8;
-        awnPaint.color = const Color(0xFFF0CC7A);
-        c.save();
-        c.translate(gx + math.sin(gAngle) * (gw + 2),
-                    gy - math.cos(gAngle) * 1);
-        c.rotate(gAngle - 0.2);
-        c.drawLine(Offset.zero, Offset(0, -awnLen), awnPaint);
-        c.restore();
+        final gw = 5.5 - i * 0.3;
+        final gh = 10.0 - i * 0.6;
 
-        c.save();
-        c.translate(gx + math.sin(gAngleOpp) * (gw + 2),
-                    gy - math.cos(gAngleOpp) * 1);
-        c.rotate(gAngleOpp + 0.2);
-        c.drawLine(Offset.zero, Offset(0, -awnLen), awnPaint);
-        c.restore();
+        // حبة يمين السنبلة
+        final rx = gx + math.cos(perpAngle) * (gw + 2.5);
+        final ry = gy + math.sin(perpAngle) * (gw + 2.5);
+        drawGrain(rx, ry, stemAngle + (isLeft ? 0.4 : -0.4), gw, gh);
+        drawAwn(rx, ry, stemAngle + (isLeft ? 0.3 : -0.3) - math.pi, 8 - i * 0.5);
+
+        // حبة يسار السنبلة
+        final lx = gx - math.cos(perpAngle) * (gw + 2.5);
+        final ly = gy - math.sin(perpAngle) * (gw + 2.5);
+        drawGrain(lx, ly, stemAngle + (isLeft ? -0.4 : 0.4), gw, gh);
+        drawAwn(lx, ly, stemAngle + (isLeft ? -0.3 : 0.3) - math.pi, 8 - i * 0.5);
       }
 
-      // الحبة القمة
-      drawGrain(c, topX, topY - 6, stemAngle, 7, 12,
-          const Color(0xFFE8B84B), const Color(0xFFC28B22));
-      awnPaint.color = const Color(0xFFF7E4B0);
-      c.save();
-      c.translate(topX, topY - 12);
-      c.rotate(stemAngle);
-      c.drawLine(Offset.zero, Offset(0, -11), awnPaint);
-      c.restore();
+      // ── الحبة القمة ──────────────────────────────────────────────
+      final tx3 = 2 * 0 * (ctrlX - x0) + 2 * 1 * (topX - ctrlX);
+      final ty3 = 2 * 0 * (ctrlY - y0) + 2 * 1 * (topY - ctrlY);
+      final topStemAngle = math.atan2(tx3, -ty3);
+
+      drawGrain(topX, topY - 5, topStemAngle, 5.5, 10);
+      drawAwn(topX, topY - 10, topStemAngle - math.pi, 10);
+      // شارب إضافي للقمة
+      drawAwn(topX - 3, topY - 8,
+          topStemAngle - math.pi + (isLeft ? 0.4 : -0.4), 8);
+      drawAwn(topX + 3, topY - 8,
+          topStemAngle - math.pi + (isLeft ? -0.4 : 0.4), 8);
     }
 
-    // ── رسم السنبلتين بشكل تاج ───────────────────────────────────────
-    // السنبلة اليسرى - تميل لليسار
-    drawWheatStalk(canvas,
-      cx - 14, cy + 22,   // قاعدة
-      -0.32,              // زاوية الميل (يسار)
-      0.55,               // انتشار الحبات
-      false,
+    // ── رسم السنبلتين ─────────────────────────────────────────────────
+    drawCurvedStalk(isLeft: true);
+    drawCurvedStalk(isLeft: false);
+
+    // ── نقطة الالتقاء + خط زخرفي ─────────────────────────────────────
+    // دائرة صغيرة في نقطة الالتقاء
+    canvas.drawCircle(
+      Offset(meetX, meetY),
+      3.5,
+      Paint()..color = colorMid..style = PaintingStyle.fill,
+    );
+    canvas.drawCircle(
+      Offset(meetX, meetY),
+      3.5,
+      Paint()..color = colorDark..style = PaintingStyle.stroke..strokeWidth = 0.8,
     );
 
-    // السنبلة اليمنى - تميل لليمين
-    drawWheatStalk(canvas,
-      cx + 14, cy + 22,   // قاعدة
-       0.32,              // زاوية الميل (يمين)
-      0.55,
-      true,
-    );
-
-    // ── خط زخرفي أسفل السنبلتين ──────────────────────────────────────
-    final basePaint = Paint()
-      ..color       = AppColors.wheat600
-      ..strokeWidth = 1.5
-      ..strokeCap   = StrokeCap.round
-      ..style       = PaintingStyle.stroke;
-
+    // خط منحنٍ أسفل نقطة الالتقاء
     final basePath = Path()
-      ..moveTo(cx - 28, cy + 26)
-      ..quadraticBezierTo(cx, cy + 32, cx + 28, cy + 26);
-    canvas.drawPath(basePath, basePaint);
-
-    // نقطة وسط
-    canvas.drawCircle(Offset(cx, cy + 29), 2.5,
-        Paint()..color = AppColors.wheat400..style = PaintingStyle.fill);
+      ..moveTo(cx - 22, meetY + 5)
+      ..quadraticBezierTo(cx, meetY + 10, cx + 22, meetY + 5);
+    canvas.drawPath(basePath,
+        Paint()..color = colorDark..strokeWidth = 1.2
+            ..strokeCap = StrokeCap.round..style = PaintingStyle.stroke);
   }
 
   @override
