@@ -70,7 +70,7 @@ class AddPostProvider extends ChangeNotifier {
             .timeout(const Duration(seconds: AppDimens.timeoutSeconds));
         imageUrl = await ref.getDownloadURL()
             .timeout(const Duration(seconds: AppDimens.shortTimeoutSecs));
-      } catch (_) {
+      } catch (e) {
         await ref.delete().catchError((_) {});
         _setError(AppStrings.errUploadImage);
         _isPublishing = false;
@@ -78,7 +78,7 @@ class AddPostProvider extends ChangeNotifier {
       }
     }
 
-    // ── الكلمات المفتاحية (تشمل المنطقة والموقع) ──────────────────
+    // ── الكلمات المفتاحية ─────────────────────────────────────────
     final keywords = ArabicUtils.buildKeywords(
         title, details, '$region $location');
 
@@ -109,30 +109,24 @@ class AddPostProvider extends ChangeNotifier {
       'searchKeywords': keywords,
     };
 
-    // ── معاملة Firestore (منع التكرار) ───────────────────────────
     _setState(AddPostState.publishing);
+
     try {
+      // ── التحقق من التكرار أولاً ───────────────────────────────────
       final cutoff = Timestamp.fromDate(DateTime.now().subtract(
           const Duration(hours: AppDimens.duplicateWindowHrs)));
 
-      final success = await _db.runTransaction((tx) async {
-        final existing = await _db.collection('posts')
-            .where('userId', isEqualTo: userId)
-            .where('type',   isEqualTo: type)
-            .where('title',  isEqualTo: title.trim())
-            .where('region', isEqualTo: region)
-            .where('createdAt', isGreaterThan: cutoff)
-            .get();
-        if (existing.docs.isNotEmpty) return false;
-        tx.set(_db.collection('posts').doc(postId), postData);
-        return true;
-      }).timeout(const Duration(seconds: AppDimens.timeoutSeconds));
+      final existing = await _db.collection('posts')
+          .where('userId', isEqualTo: userId)
+          .where('type',   isEqualTo: type)
+          .where('title',  isEqualTo: title.trim())
+          .where('region', isEqualTo: region)
+          .where('createdAt', isGreaterThan: cutoff)
+          .limit(1)
+          .get()
+          .timeout(const Duration(seconds: AppDimens.timeoutSeconds));
 
-      if (success == true) {
-        _setState(AddPostState.success);
-        _isPublishing = false;
-        return true;
-      } else {
+      if (existing.docs.isNotEmpty) {
         if (storagePath != null) {
           await _storage.ref(storagePath).delete().catchError((_) {});
         }
@@ -140,11 +134,23 @@ class AddPostProvider extends ChangeNotifier {
         _isPublishing = false;
         return false;
       }
-    } catch (_) {
+
+      // ── كتابة المنشور مباشرة ──────────────────────────────────────
+      await _db.collection('posts')
+          .doc(postId)
+          .set(postData)
+          .timeout(const Duration(seconds: AppDimens.timeoutSeconds));
+
+      _setState(AddPostState.success);
+      _isPublishing = false;
+      return true;
+
+    } catch (e) {
+      debugPrint('Publish error: $e');
       if (storagePath != null) {
         await _storage.ref(storagePath).delete().catchError((_) {});
       }
-      _setError(AppStrings.errTimeout);
+      _setError(AppStrings.errGeneric);
       _isPublishing = false;
       return false;
     }
