@@ -26,7 +26,7 @@ class WelcomeScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppDimens.radiusXl),
                 border: Border.all(color: AppColors.wheat400, width: 2.5),
               ),
-              child: CustomPaint(painter: WheatLogoPainter()),
+              child: CustomPaint(painter: WheatCrownPainter()),
             ),
             const SizedBox(height: AppDimens.xl),
             const Text(AppStrings.appName,
