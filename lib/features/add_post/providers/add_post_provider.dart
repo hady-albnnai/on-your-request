@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/constants/app_dimens.dart';
 import '../../../core/constants/app_strings.dart';
@@ -14,7 +13,7 @@ class AddPostProvider extends ChangeNotifier {
   final _db      = FirebaseFirestore.instance;
   final _storage = FirebaseStorage.instance;
 
-  AddPostState _state      = AddPostState.initial;
+  AddPostState _state       = AddPostState.initial;
   String?      _errorMsg;
   bool         _isPublishing = false;
 
@@ -23,7 +22,16 @@ class AddPostProvider extends ChangeNotifier {
   bool get isLoading =>
       _state == AddPostState.uploading || _state == AddPostState.publishing;
 
+  // إعادة الضبط عند فتح الشاشة
+  void reset() {
+    _state       = AddPostState.initial;
+    _errorMsg    = null;
+    _isPublishing = false;
+    notifyListeners();
+  }
+
   Future<bool> publishPost({
+    required String userId,   // يُمرَّر من AuthProvider مباشرة
     required String type,
     required String title,
     required String details,
@@ -36,19 +44,22 @@ class AddPostProvider extends ChangeNotifier {
     File?    imageFile,
   }) async {
     if (_isPublishing) return false;
+    if (userId.isEmpty) { _setError(AppStrings.loginRequired); return false; }
 
-    if (title.trim().isEmpty) { _setError(AppStrings.errTitleRequired); return false; }
+    // التحقق من البيانات
+    if (title.trim().isEmpty)  { _setError(AppStrings.errTitleRequired);    return false; }
     if (title.trim().length > AppDimens.maxTitleLength) { _setError(AppStrings.errTitleLong); return false; }
-    if (region == AppStrings.allRegions) { _setError(AppStrings.errRegionRequired); return false; }
-    if (location.trim().isEmpty) { _setError(AppStrings.errLocationRequired); return false; }
+    if (region == AppStrings.allRegions)  { _setError(AppStrings.errRegionRequired);   return false; }
+    if (location.trim().isEmpty)          { _setError(AppStrings.errLocationRequired); return false; }
     if (type == 'offer' && (price == null || price <= 0)) { _setError(AppStrings.errPriceRequired); return false; }
-    if (details.length > AppDimens.maxDetailsLength) { _setError(AppStrings.errDetails500); return false; }
+    if (details.length > AppDimens.maxDetailsLength)      { _setError(AppStrings.errDetails500);    return false; }
 
     _isPublishing = true;
-    final postId      = const Uuid().v4();
+    final postId  = const Uuid().v4();
     String? imageUrl;
     String? storagePath;
 
+    // رفع الصورة
     if (imageFile != null) {
       _setState(AddPostState.uploading);
       storagePath = 'posts/$postId/image.jpg';
@@ -66,15 +77,13 @@ class AddPostProvider extends ChangeNotifier {
       }
     }
 
-    // الكلمات المفتاحية: العنوان + التفاصيل + الفئة + الفئة الفرعية + الموقع
+    // بناء الكلمات المفتاحية
     final keywords = ArabicUtils.buildKeywords(
         '$title $category $subCategory', details, '$region $location');
 
-    final prefs  = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId') ?? '';
     final now    = Timestamp.now();
     final expiry = Timestamp.fromDate(
-      DateTime.now().add(const Duration(days: AppDimens.postExpiryDays)));
+        DateTime.now().add(const Duration(days: AppDimens.postExpiryDays)));
 
     final postData = {
       'id':             postId,
@@ -101,8 +110,9 @@ class AddPostProvider extends ChangeNotifier {
     _setState(AddPostState.publishing);
 
     try {
-      final cutoff = Timestamp.fromDate(DateTime.now().subtract(
-          const Duration(hours: AppDimens.duplicateWindowHrs)));
+      // التحقق من التكرار
+      final cutoff = Timestamp.fromDate(DateTime.now()
+          .subtract(const Duration(hours: AppDimens.duplicateWindowHrs)));
 
       final existing = await _db.collection('posts')
           .where('userId', isEqualTo: userId)
@@ -115,17 +125,13 @@ class AddPostProvider extends ChangeNotifier {
           .timeout(const Duration(seconds: AppDimens.timeoutSeconds));
 
       if (existing.docs.isNotEmpty) {
-        if (storagePath != null) {
-          await _storage.ref(storagePath).delete().catchError((_) {});
-        }
+        if (storagePath != null) await _storage.ref(storagePath).delete().catchError((_) {});
         _setError(AppStrings.duplicatePost);
         _isPublishing = false;
         return false;
       }
 
-      await _db.collection('posts')
-          .doc(postId)
-          .set(postData)
+      await _db.collection('posts').doc(postId).set(postData)
           .timeout(const Duration(seconds: AppDimens.timeoutSeconds));
 
       _setState(AddPostState.success);
@@ -134,16 +140,13 @@ class AddPostProvider extends ChangeNotifier {
 
     } catch (e) {
       debugPrint('Publish error: $e');
-      if (storagePath != null) {
-        await _storage.ref(storagePath).delete().catchError((_) {});
-      }
+      if (storagePath != null) await _storage.ref(storagePath).delete().catchError((_) {});
       _setError(AppStrings.errGeneric);
       _isPublishing = false;
       return false;
     }
   }
 
-  void reset() { _state = AddPostState.initial; _errorMsg = null; notifyListeners(); }
   void _setState(AddPostState s) { _state = s; notifyListeners(); }
   void _setError(String msg) { _errorMsg = msg; _state = AddPostState.error; notifyListeners(); }
 }
