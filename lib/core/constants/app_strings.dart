@@ -12,8 +12,9 @@ abstract class AppStrings {
   static const retry        = 'إعادة المحاولة';
   static const save         = 'حفظ';
   static const close        = 'إغلاق';
+  static const other        = 'أخرى';
 
-  // ── المناطق الرئيسية الثلاث ──────────────────────────────────────────
+  // ── المناطق الرئيسية ─────────────────────────────────────────────────
   static const allRegions = 'جميع المناطق';
   static const regions = [
     'جميع المناطق',
@@ -21,6 +22,72 @@ abstract class AppStrings {
     'صلخد',
     'شهبا',
   ];
+
+  // ── الفئات الرئيسية ───────────────────────────────────────────────────
+  static const allCategories = 'جميع الفئات';
+  static const categories = [
+    'جميع الفئات',
+    '🚗 سيارات',
+    '🏠 عقارات',
+    '♻️ مستعمل',
+    '🔧 خدمات',
+    '💼 وظائف',
+    '📱 إلكترونيات',
+    '🌐 أخرى',
+  ];
+
+  // ── الفئات الفرعية ────────────────────────────────────────────────────
+  static const Map<String, List<String>> subCategories = {
+    '🚗 سيارات': [
+      'بيع سيارة',
+      'إيجار سيارة',
+      'استئجار سيارة',
+      'قطع غيار',
+      'أخرى',
+    ],
+    '🏠 عقارات': [
+      'بيع عقار',
+      'شراء عقار',
+      'إيجار عقار',
+      'استئجار عقار',
+      'أخرى',
+    ],
+    '♻️ مستعمل': [
+      'أدوات كهربائية',
+      'غسالات',
+      'برادات',
+      'أثاث',
+      'إلكترونيات',
+      'ملابس',
+      'أخرى',
+    ],
+    '🔧 خدمات': [
+      'سباكة',
+      'كهرباء',
+      'نجارة',
+      'دهان',
+      'تنظيف',
+      'بناء',
+      'نقل وشحن',
+      'أخرى',
+    ],
+    '💼 وظائف': [
+      'عروض عمل',
+      'طلب عمل',
+      'تدريب مهني',
+      'أخرى',
+    ],
+    '📱 إلكترونيات': [
+      'هواتف',
+      'أجهزة كمبيوتر',
+      'تلفزيونات',
+      'إكسسوار',
+      'أخرى',
+    ],
+    '🌐 أخرى': [
+      'أخرى',
+    ],
+  };
 
   // ── العملات ─────────────────────────────────────────────────────────
   static const currencySYP = 'SYP';
@@ -45,8 +112,10 @@ abstract class AppStrings {
   static const offers          = 'عروض';
   static const addPost         = 'إضافة منشور';
   static const postTitle       = 'العنوان';
-  static const postTitleHint   = 'مثال: مطلوب سباك متمرس…';
+  static const postTitleHint   = 'مثال: سيارة كيو كيو 2018…';
   static const postDetails     = 'التفاصيل (اختياري)';
+  static const postCategory    = 'الفئة';
+  static const postSubCategory = 'الفئة الفرعية';
   static const postRegion      = 'المنطقة الرئيسية';
   static const postLocation    = 'الموقع التفصيلي';
   static const postLocationHint= 'مثال: حي المطار، شارع الجلاء…';
@@ -83,6 +152,8 @@ abstract class AppStrings {
 
   // ── البحث ────────────────────────────────────────────────────────────
   static const searchHint      = 'ابحث في السويداء…';
+  static const filterCategory  = 'الفئة';
+  static const filterRegion    = 'المنطقة';
 
   // ── التقييم ──────────────────────────────────────────────────────────
   static const ratingTitle     = 'شكراً لاستخدامك بخدمتك!';
@@ -93,6 +164,7 @@ abstract class AppStrings {
   // ── الأخطاء ──────────────────────────────────────────────────────────
   static const errTitleRequired    = 'العنوان مطلوب';
   static const errTitleLong        = 'العنوان طويل جداً (100 حرف كحد أقصى)';
+  static const errCategoryRequired = 'اختر فئة للمنشور';
   static const errRegionRequired   = 'اختر منطقة رئيسية';
   static const errLocationRequired = 'الموقع التفصيلي مطلوب';
   static const errPriceRequired    = 'أدخل سعراً صحيحاً';
