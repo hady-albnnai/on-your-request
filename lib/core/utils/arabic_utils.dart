@@ -1,25 +1,23 @@
 /// أدوات معالجة النص العربي للبحث
 class ArabicUtils {
 
-  /// تطبيع كلمة واحدة:
-  /// - حذف التشكيل
-  /// - توحيد الألف والهاء
-  /// - حذف "ال" التعريف من البداية
+  /// تطبيع كلمة واحدة
   static String normalizeWord(String word) {
     return word
         .toLowerCase()
-        .replaceAll(RegExp(r'[ًٌٍَُِّْ]'), '')  // حذف التشكيل
+        .replaceAll(RegExp(r'[ًٌٍَُِّْ]'), '')
         .replaceAll('أ', 'ا')
         .replaceAll('إ', 'ا')
         .replaceAll('آ', 'ا')
         .replaceAll('ة', 'ه')
-        .replaceAll(RegExp(r'^ال'), '')           // حذف "ال" التعريف
+        .replaceAll(RegExp(r'^ال'), '')
         .trim();
   }
 
-  /// بناء قائمة الكلمات المفتاحية للمنشور
-  static List<String> buildKeywords(String title, String? details, String region) {
-    final combined = '$title ${details ?? ''} $region';
+  /// بناء قائمة الكلمات المفتاحية
+  /// تشمل: العنوان + التفاصيل + الفئة + المنطقة + الموقع
+  static List<String> buildKeywords(String title, String? details, String extra) {
+    final combined = '$title ${details ?? ''} $extra';
     return combined
         .split(RegExp(r'\s+'))
         .map((w) => w.trim())
@@ -30,14 +28,23 @@ class ArabicUtils {
         .toList();
   }
 
-  /// تطبيع نص البحث – يجب أن يطابق normalizeWord تماماً
+  /// تطبيع نص البحث - يعيد أول كلمة مطبّعة
+  /// Firestore arrayContains يدعم كلمة واحدة فقط
   static String normalizeQuery(String query) {
     final words = query.trim().split(RegExp(r'\s+'));
     if (words.isEmpty) return '';
-    return normalizeWord(words.first); // Firestore: arrayContains كلمة واحدة
+    return normalizeWord(words.first);
   }
 
-  /// تنسيق السعر بفواصل عربية
+  /// تطبيع نص البحث - يعيد كل الكلمات (للفلترة المحلية)
+  static List<String> normalizeQueryAll(String query) {
+    return query.trim().split(RegExp(r'\s+'))
+        .map(normalizeWord)
+        .where((w) => w.isNotEmpty)
+        .toList();
+  }
+
+  /// تنسيق السعر بفواصل
   static String formatPrice(double price) {
     final n = price.toInt();
     return n.toString().replaceAllMapped(
@@ -46,7 +53,7 @@ class ArabicUtils {
     );
   }
 
-  /// تنسيق التاريخ النسبي
+  /// تنسيق الوقت النسبي
   static String timeAgo(DateTime date) {
     final diff = DateTime.now().difference(date);
     if (diff.inMinutes  < 1)  return 'الآن';
