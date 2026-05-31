@@ -19,17 +19,19 @@ class PostsProvider extends ChangeNotifier {
   bool              _isLoading = false;
   int               _requestId = 0;
 
-  String _currentType    = 'request';
-  String _selectedRegion = AppStrings.allRegions;
-  String _searchText     = '';
+  String _currentType     = 'request';
+  String _selectedRegion  = AppStrings.allRegions;
+  String _selectedCategory = AppStrings.allCategories;
+  String _searchText      = '';
   Timer? _debounceTimer;
 
-  List<PostModel> get posts          => _posts;
-  LoadState       get state          => _state;
-  String?         get errorMsg       => _errorMsg;
-  bool            get hasMore        => _hasMore;
-  String          get currentType    => _currentType;
-  String          get selectedRegion => _selectedRegion;
+  List<PostModel> get posts            => _posts;
+  LoadState       get state            => _state;
+  String?         get errorMsg         => _errorMsg;
+  bool            get hasMore          => _hasMore;
+  String          get currentType      => _currentType;
+  String          get selectedRegion   => _selectedRegion;
+  String          get selectedCategory => _selectedCategory;
 
   void setType(String type) {
     if (_currentType == type) return;
@@ -40,6 +42,12 @@ class PostsProvider extends ChangeNotifier {
   void setRegion(String region) {
     if (_selectedRegion == region) return;
     _selectedRegion = region;
+    resetAndReload();
+  }
+
+  void setCategory(String category) {
+    if (_selectedCategory == category) return;
+    _selectedCategory = category;
     resetAndReload();
   }
 
@@ -69,18 +77,22 @@ class PostsProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // ── بناء الاستعلام ─────────────────────────────────────────────
       Query query = _db.collection('posts')
           .where('type',      isEqualTo: _currentType)
           .where('status',    isEqualTo: 'active')
           .where('expiresAt', isGreaterThan: Timestamp.now());
 
-      // فلتر المنطقة فقط إذا لم تكن "جميع المناطق"
+      // فلتر المنطقة
       if (_selectedRegion != AppStrings.allRegions) {
         query = query.where('region', isEqualTo: _selectedRegion);
       }
 
-      // فلتر البحث
+      // فلتر الفئة
+      if (_selectedCategory != AppStrings.allCategories) {
+        query = query.where('category', isEqualTo: _selectedCategory);
+      }
+
+      // البحث النصي
       if (_searchText.trim().isNotEmpty) {
         final kw = ArabicUtils.normalizeQuery(_searchText);
         if (kw.isNotEmpty) {
@@ -95,7 +107,7 @@ class PostsProvider extends ChangeNotifier {
 
       if (_lastDoc != null) query = query.startAfterDocument(_lastDoc!);
 
-      debugPrint('🔍 Query: type=$_currentType region=$_selectedRegion');
+      debugPrint('🔍 type=$_currentType region=$_selectedRegion category=$_selectedCategory search=$_searchText');
 
       final snap = await query
           .get()
@@ -112,15 +124,9 @@ class PostsProvider extends ChangeNotifier {
       _state = LoadState.success;
 
     } catch (e) {
-      debugPrint('❌ Firestore error: $e');
-      if (myId == _requestId) {
-        // إذا كانت القائمة فارغة نظهر خطأ، وإلا نكتفي بإيقاف التحميل
-        if (_posts.isEmpty) {
-          _errorMsg = e.toString().contains('index')
-              ? 'الفهارس لم تُفعَّل بعد، انتظر دقيقة'
-              : 'لا توجد منشورات حالياً';
-          _state = LoadState.success; // نعرض "لا توجد منشورات" بدل خطأ
-        }
+      debugPrint('❌ Error: $e');
+      if (myId == _requestId && _posts.isEmpty) {
+        _state = LoadState.success;
       }
     } finally {
       _isLoading = false;
