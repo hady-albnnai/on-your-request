@@ -19,10 +19,10 @@ class PostsProvider extends ChangeNotifier {
   bool              _isLoading = false;
   int               _requestId = 0;
 
-  String _currentType     = 'request';
-  String _selectedRegion  = AppStrings.allRegions;
+  String _currentType      = 'request';
+  String _selectedRegion   = AppStrings.allRegions;
   String _selectedCategory = AppStrings.allCategories;
-  String _searchText      = '';
+  String _searchText       = '';
   Timer? _debounceTimer;
 
   List<PostModel> get posts            => _posts;
@@ -77,37 +77,62 @@ class PostsProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      Query query = _db.collection('posts')
-          .where('type',      isEqualTo: _currentType)
-          .where('status',    isEqualTo: 'active')
-          .where('expiresAt', isGreaterThan: Timestamp.now());
+      // ── استراتيجية الاستعلام الذكية ────────────────────────────────
+      // نختار أبسط استعلام ممكن لتجنب الحاجة لفهارس معقدة
+      Query query;
 
-      // فلتر المنطقة
-      if (_selectedRegion != AppStrings.allRegions) {
-        query = query.where('region', isEqualTo: _selectedRegion);
-      }
+      final hasSearch   = _searchText.trim().isNotEmpty;
+      final hasRegion   = _selectedRegion   != AppStrings.allRegions;
+      final hasCategory = _selectedCategory != AppStrings.allCategories;
 
-      // فلتر الفئة
-      if (_selectedCategory != AppStrings.allCategories) {
-        query = query.where('category', isEqualTo: _selectedCategory);
-      }
-
-      // البحث النصي
-      if (_searchText.trim().isNotEmpty) {
+      if (hasSearch) {
+        // البحث النصي: نستخدم arrayContains مع type + status فقط
         final kw = ArabicUtils.normalizeQuery(_searchText);
-        if (kw.isNotEmpty) {
-          query = query.where('searchKeywords', arrayContains: kw);
-        }
-      }
+        query = _db.collection('posts')
+            .where('type',           isEqualTo: _currentType)
+            .where('status',         isEqualTo: 'active')
+            .where('expiresAt',      isGreaterThan: Timestamp.now())
+            .where('searchKeywords', arrayContains: kw)
+            .orderBy('expiresAt')
+            .orderBy('createdAt', descending: true)
+            .limit(AppDimens.postsPageSize);
 
-      query = query
-          .orderBy('expiresAt', descending: false)
-          .orderBy('createdAt', descending: true)
-          .limit(AppDimens.postsPageSize);
+      } else if (hasCategory) {
+        // فلتر الفئة
+        query = _db.collection('posts')
+            .where('type',     isEqualTo: _currentType)
+            .where('status',   isEqualTo: 'active')
+            .where('category', isEqualTo: _selectedCategory)
+            .where('expiresAt', isGreaterThan: Timestamp.now())
+            .orderBy('expiresAt')
+            .orderBy('createdAt', descending: true)
+            .limit(AppDimens.postsPageSize);
+
+      } else if (hasRegion) {
+        // فلتر المنطقة
+        query = _db.collection('posts')
+            .where('type',     isEqualTo: _currentType)
+            .where('status',   isEqualTo: 'active')
+            .where('region',   isEqualTo: _selectedRegion)
+            .where('expiresAt', isGreaterThan: Timestamp.now())
+            .orderBy('expiresAt')
+            .orderBy('createdAt', descending: true)
+            .limit(AppDimens.postsPageSize);
+
+      } else {
+        // الكل: بدون فلاتر إضافية
+        query = _db.collection('posts')
+            .where('type',     isEqualTo: _currentType)
+            .where('status',   isEqualTo: 'active')
+            .where('expiresAt', isGreaterThan: Timestamp.now())
+            .orderBy('expiresAt')
+            .orderBy('createdAt', descending: true)
+            .limit(AppDimens.postsPageSize);
+      }
 
       if (_lastDoc != null) query = query.startAfterDocument(_lastDoc!);
 
-      debugPrint('🔍 type=$_currentType region=$_selectedRegion category=$_selectedCategory search=$_searchText');
+      debugPrint('🔍 type=$_currentType region=$_selectedRegion cat=$_selectedCategory search=$_searchText');
 
       final snap = await query
           .get()
@@ -115,10 +140,22 @@ class PostsProvider extends ChangeNotifier {
 
       if (myId != _requestId) return;
 
-      final newPosts = snap.docs.map(PostModel.fromFirestore).toList();
+      var newPosts = snap.docs.map(PostModel.fromFirestore).toList();
+
+      // فلترة محلية إضافية إذا كان هناك فلترين معاً
+      if (hasCategory && hasRegion) {
+        newPosts = newPosts.where((p) =>
+          p.category == _selectedCategory && p.region == _selectedRegion
+        ).toList();
+      } else if (hasSearch && hasRegion) {
+        newPosts = newPosts.where((p) => p.region == _selectedRegion).toList();
+      } else if (hasSearch && hasCategory) {
+        newPosts = newPosts.where((p) => p.category == _selectedCategory).toList();
+      }
+
       debugPrint('✅ Got ${newPosts.length} posts');
 
-      _hasMore = newPosts.length == AppDimens.postsPageSize;
+      _hasMore = snap.docs.length == AppDimens.postsPageSize;
       if (snap.docs.isNotEmpty) _lastDoc = snap.docs.last;
       _posts.addAll(newPosts);
       _state = LoadState.success;
@@ -126,6 +163,9 @@ class PostsProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('❌ Error: $e');
       if (myId == _requestId && _posts.isEmpty) {
+        _errorMsg = e.toString().contains('index')
+            ? 'جارٍ تهيئة الفهارس، حاول مرة أخرى'
+            : null;
         _state = LoadState.success;
       }
     } finally {
