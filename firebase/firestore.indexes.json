@@ -44,11 +44,11 @@
       "collectionGroup": "posts",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "userId",    "order": "ASCENDING"  },
-        { "fieldPath": "type",      "order": "ASCENDING"  },
-        { "fieldPath": "title",     "order": "ASCENDING"  },
         { "fieldPath": "region",    "order": "ASCENDING"  },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
+        { "fieldPath": "title",     "order": "ASCENDING"  },
+        { "fieldPath": "type",      "order": "ASCENDING"  },
+        { "fieldPath": "userId",    "order": "ASCENDING"  },
+        { "fieldPath": "createdAt", "order": "ASCENDING"  }
       ]
     }
   ],
