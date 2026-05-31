@@ -19,17 +19,20 @@ class _AddPostScreenState extends State<AddPostScreen> {
   final _priceCtrl    = TextEditingController();
   final _locationCtrl = TextEditingController();
 
-  String  _type     = 'request';
-  String  _region   = 'السويداء';
-  String  _currency = AppStrings.currencySYP;
+  String  _type        = 'request';
+  String  _region      = 'السويداء';
+  String  _category    = '🌐 أخرى';
+  String  _subCategory = 'أخرى';
+  String  _currency    = AppStrings.currencySYP;
   File?   _imageFile;
+
+  List<String> get _subCats =>
+      AppStrings.subCategories[_category] ?? ['أخرى'];
 
   @override
   void dispose() {
-    _titleCtrl.dispose();
-    _detailsCtrl.dispose();
-    _priceCtrl.dispose();
-    _locationCtrl.dispose();
+    _titleCtrl.dispose(); _detailsCtrl.dispose();
+    _priceCtrl.dispose(); _locationCtrl.dispose();
     super.dispose();
   }
 
@@ -44,86 +47,141 @@ class _AddPostScreenState extends State<AddPostScreen> {
           padding: const EdgeInsets.all(AppDimens.lg),
           children: [
 
-            // ── نوع المنشور ───────────────────────────────────────────
+            // ── نوع المنشور ──────────────────────────────────────────
             _SectionLabel('نوع المنشور'),
             const SizedBox(height: AppDimens.sm),
             Row(children: [
-              _TypeChip(
-                label: AppStrings.typeRequest,
+              _TypeChip(label: AppStrings.typeRequest,
                 selected: _type == 'request',
-                onTap: () => setState(() => _type = 'request'),
-              ),
+                onTap: () => setState(() => _type = 'request')),
               const SizedBox(width: AppDimens.sm),
-              _TypeChip(
-                label: AppStrings.typeOffer,
+              _TypeChip(label: AppStrings.typeOffer,
                 selected: _type == 'offer',
-                onTap: () => setState(() => _type = 'offer'),
-              ),
+                onTap: () => setState(() => _type = 'offer')),
             ]),
             const SizedBox(height: AppDimens.lg),
 
-            // ── العنوان ───────────────────────────────────────────────
-            TextFormField(
-              controller: _titleCtrl,
-              maxLength:  AppDimens.maxTitleLength,
-              decoration: const InputDecoration(
-                labelText: AppStrings.postTitle,
-                hintText:  AppStrings.postTitleHint,
+            // ── الفئة الرئيسية ───────────────────────────────────────
+            _SectionLabel(AppStrings.postCategory),
+            const SizedBox(height: AppDimens.sm),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.basalt100),
+                borderRadius: BorderRadius.circular(AppDimens.radiusSm),
+                color: AppColors.surface,
               ),
-              validator: (v) => (v == null || v.trim().isEmpty)
-                  ? AppStrings.errTitleRequired : null,
+              padding: const EdgeInsets.symmetric(horizontal: AppDimens.md),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: _category,
+                  isExpanded: true,
+                  items: AppStrings.categories
+                      .where((c) => c != AppStrings.allCategories)
+                      .map((c) => DropdownMenuItem(value: c,
+                          child: Text(c, style: const TextStyle(
+                              fontFamily: 'Cairo',
+                              fontSize: AppDimens.fontMd))))
+                      .toList(),
+                  onChanged: (v) {
+                    if (v != null) setState(() {
+                      _category = v;
+                      _subCategory = AppStrings.subCategories[v]?.first ?? 'أخرى';
+                    });
+                  },
+                ),
+              ),
             ),
             const SizedBox(height: AppDimens.md),
 
-            // ── المنطقة الرئيسية (3 أزرار) ───────────────────────────
-            _SectionLabel(AppStrings.postRegion),
+            // ── الفئة الفرعية ────────────────────────────────────────
+            _SectionLabel(AppStrings.postSubCategory),
             const SizedBox(height: AppDimens.sm),
-            Row(children: AppStrings.regions
-                .skip(1) // تجاهل "جميع المناطق"
-                .map((r) => Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: AppDimens.sm),
-                    child: _RegionChip(
-                      label:    r,
-                      selected: _region == r,
-                      onTap:    () => setState(() => _region = r),
+            Wrap(
+              spacing: AppDimens.sm,
+              runSpacing: AppDimens.sm,
+              children: _subCats.map((s) => GestureDetector(
+                onTap: () => setState(() => _subCategory = s),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimens.md, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: _subCategory == s
+                        ? AppColors.basalt800 : AppColors.basalt50,
+                    borderRadius: BorderRadius.circular(AppDimens.radiusPill),
+                    border: Border.all(
+                      color: _subCategory == s
+                          ? AppColors.wheat400 : AppColors.basalt100,
+                      width: _subCategory == s ? 1.5 : 1,
                     ),
                   ),
-                ))
-                .toList()),
+                  child: Text(s, style: TextStyle(
+                    fontFamily: 'Cairo', fontSize: AppDimens.fontSm,
+                    fontWeight: FontWeight.w600,
+                    color: _subCategory == s
+                        ? AppColors.wheat300 : AppColors.basalt500,
+                  )),
+                ),
+              )).toList(),
+            ),
             const SizedBox(height: AppDimens.lg),
 
-            // ── الموقع التفصيلي (إلزامي) ─────────────────────────────
+            // ── العنوان ──────────────────────────────────────────────
             TextFormField(
-              controller: _locationCtrl,
-              maxLength:  80,
+              controller: _titleCtrl,
+              maxLength: AppDimens.maxTitleLength,
               decoration: const InputDecoration(
-                labelText: AppStrings.postLocation,
-                hintText:  AppStrings.postLocationHint,
-              ),
+                labelText: AppStrings.postTitle,
+                hintText:  AppStrings.postTitleHint),
               validator: (v) => (v == null || v.trim().isEmpty)
-                  ? AppStrings.errLocationRequired : null,
+                  ? AppStrings.errTitleRequired : null,
             ),
             const SizedBox(height: AppDimens.md),
 
             // ── التفاصيل ─────────────────────────────────────────────
             TextFormField(
               controller: _detailsCtrl,
-              maxLength:  AppDimens.maxDetailsLength,
-              maxLines:   3,
+              maxLength: AppDimens.maxDetailsLength,
+              maxLines: 3,
               decoration: const InputDecoration(
                 labelText: AppStrings.postDetails,
-                hintText:  'أضف تفاصيل إضافية…',
-              ),
+                hintText: 'أضف تفاصيل إضافية…'),
             ),
             const SizedBox(height: AppDimens.md),
 
-            // ── السعر + العملة (للعروض فقط) ──────────────────────────
+            // ── المنطقة الرئيسية ─────────────────────────────────────
+            _SectionLabel(AppStrings.postRegion),
+            const SizedBox(height: AppDimens.sm),
+            Row(children: AppStrings.regions
+                .skip(1)
+                .map((r) => Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: AppDimens.sm),
+                    child: _RegionChip(
+                      label: r, selected: _region == r,
+                      onTap: () => setState(() => _region = r)),
+                  ),
+                ))
+                .toList()),
+            const SizedBox(height: AppDimens.lg),
+
+            // ── الموقع التفصيلي ──────────────────────────────────────
+            TextFormField(
+              controller: _locationCtrl,
+              maxLength: 80,
+              decoration: const InputDecoration(
+                labelText: AppStrings.postLocation,
+                hintText:  AppStrings.postLocationHint),
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? AppStrings.errLocationRequired : null,
+            ),
+            const SizedBox(height: AppDimens.md),
+
+            // ── السعر + العملة ───────────────────────────────────────
             if (_type == 'offer') ...[
               Row(children: [
                 Expanded(
                   child: TextFormField(
-                    controller:  _priceCtrl,
+                    controller: _priceCtrl,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
                         labelText: AppStrings.postPrice),
@@ -157,10 +215,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
               child: Container(
                 height: 120,
                 decoration: BoxDecoration(
-                  color:        AppColors.basalt50,
+                  color: AppColors.basalt50,
                   borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-                  border:       Border.all(color: AppColors.basalt100),
-                ),
+                  border: Border.all(color: AppColors.basalt100)),
                 child: _imageFile != null
                     ? ClipRRect(
                         borderRadius:
@@ -177,8 +234,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                             style: TextStyle(fontFamily: 'Cairo',
                                 fontSize: AppDimens.fontSm,
                                 color: AppColors.basalt400)),
-                        ],
-                      ),
+                        ]),
               ),
             ),
 
@@ -189,31 +245,26 @@ class _AddPostScreenState extends State<AddPostScreen> {
                 padding: const EdgeInsets.all(AppDimens.md),
                 decoration: BoxDecoration(
                   color: AppColors.error.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-                ),
+                  borderRadius: BorderRadius.circular(AppDimens.radiusSm)),
                 child: Text(provider.errorMsg!,
                   style: const TextStyle(color: AppColors.error,
                       fontFamily: 'Cairo', fontSize: AppDimens.fontSm)),
               ),
             ],
-
             const SizedBox(height: AppDimens.xxl),
 
             // ── زر النشر ─────────────────────────────────────────────
             ElevatedButton(
               onPressed: provider.isLoading ? null : _publish,
               child: provider.isLoading
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  ? Row(mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const SizedBox(width: 18, height: 18,
                           child: CircularProgressIndicator(strokeWidth: 2,
                               color: AppColors.basalt900)),
                         const SizedBox(width: AppDimens.sm),
-                        Text(
-                          provider.state == AddPostState.uploading
-                              ? 'جارٍ رفع الصورة…'
-                              : AppStrings.publishing,
+                        Text(provider.state == AddPostState.uploading
+                            ? 'جارٍ رفع الصورة…' : AppStrings.publishing,
                           style: const TextStyle(fontFamily: 'Cairo')),
                       ])
                   : const Text(AppStrings.publish),
@@ -235,14 +286,16 @@ class _AddPostScreenState extends State<AddPostScreen> {
     if (!_formKey.currentState!.validate()) return;
     final provider = context.read<AddPostProvider>();
     final ok = await provider.publishPost(
-      type:      _type,
-      title:     _titleCtrl.text,
-      details:   _detailsCtrl.text,
-      region:    _region,
-      location:  _locationCtrl.text,
-      price:     _type == 'offer' ? double.tryParse(_priceCtrl.text) : null,
-      currency:  _currency,
-      imageFile: _imageFile,
+      type:        _type,
+      title:       _titleCtrl.text,
+      details:     _detailsCtrl.text,
+      category:    _category,
+      subCategory: _subCategory,
+      region:      _region,
+      location:    _locationCtrl.text,
+      price:       _type == 'offer' ? double.tryParse(_priceCtrl.text) : null,
+      currency:    _currency,
+      imageFile:   _imageFile,
     );
     if (mounted && ok) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -253,7 +306,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
   }
 }
 
-// ── مكونات مساعدة ─────────────────────────────────────────────────────
+// ── Widgets مساعدة ────────────────────────────────────────────────────
 class _SectionLabel extends StatelessWidget {
   final String text;
   const _SectionLabel(this.text);
@@ -268,8 +321,7 @@ class _TypeChip extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  const _TypeChip({required this.label, required this.selected,
-      required this.onTap});
+  const _TypeChip({required this.label, required this.selected, required this.onTap});
   @override
   Widget build(BuildContext context) => GestureDetector(
     onTap: onTap,
@@ -280,12 +332,10 @@ class _TypeChip extends StatelessWidget {
         color: selected ? AppColors.wheat400 : AppColors.basalt50,
         borderRadius: BorderRadius.circular(AppDimens.radiusPill),
         border: Border.all(
-            color: selected ? AppColors.wheat400 : AppColors.basalt100),
-      ),
-      child: Text(label,
-        style: TextStyle(fontFamily: 'Cairo', fontSize: AppDimens.fontMd,
-            fontWeight: FontWeight.w700,
-            color: selected ? AppColors.basalt900 : AppColors.basalt500)),
+            color: selected ? AppColors.wheat400 : AppColors.basalt100)),
+      child: Text(label, style: TextStyle(fontFamily: 'Cairo',
+          fontSize: AppDimens.fontMd, fontWeight: FontWeight.w700,
+          color: selected ? AppColors.basalt900 : AppColors.basalt500)),
     ),
   );
 }
@@ -294,8 +344,7 @@ class _RegionChip extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  const _RegionChip({required this.label, required this.selected,
-      required this.onTap});
+  const _RegionChip({required this.label, required this.selected, required this.onTap});
   @override
   Widget build(BuildContext context) => GestureDetector(
     onTap: onTap,
@@ -305,14 +354,10 @@ class _RegionChip extends StatelessWidget {
         color: selected ? AppColors.basalt800 : AppColors.basalt50,
         borderRadius: BorderRadius.circular(AppDimens.radiusSm),
         border: Border.all(
-            color: selected ? AppColors.wheat400 : AppColors.basalt100),
-      ),
-      child: Center(
-        child: Text(label,
-          style: TextStyle(fontFamily: 'Cairo',
-              fontSize: AppDimens.fontSm, fontWeight: FontWeight.w700,
-              color: selected ? AppColors.wheat300 : AppColors.basalt500)),
-      ),
+            color: selected ? AppColors.wheat400 : AppColors.basalt100)),
+      child: Center(child: Text(label, style: TextStyle(fontFamily: 'Cairo',
+          fontSize: AppDimens.fontSm, fontWeight: FontWeight.w700,
+          color: selected ? AppColors.wheat300 : AppColors.basalt500))),
     ),
   );
 }
