@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // أيقونة سنبلة القمح في AppBar
           SizedBox(
             width: 34, height: 34,
-            child: CustomPaint(painter: WheatLogoPainter()),
+            child: CustomPaint(painter: WheatCrownPainter()),
           ),
           const SizedBox(width: 8),
           Column(crossAxisAlignment: CrossAxisAlignment.start,
