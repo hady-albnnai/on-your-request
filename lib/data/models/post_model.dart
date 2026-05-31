@@ -9,8 +9,8 @@ class PostModel {
   final PostType     type;
   final String       title;
   final String?      details;
-  final String       category;      // الفئة الرئيسية
-  final String       subCategory;   // الفئة الفرعية
+  final String       category;
+  final String       subCategory;
   final String       region;
   final String       location;
   final double?      price;
@@ -54,7 +54,7 @@ class PostModel {
       type:           d['type'] == 'offer' ? PostType.offer : PostType.request,
       title:          d['title']        ?? '',
       details:        d['details'],
-      category:       d['category']     ?? '🌐 أخرى',
+      category:       d['category']     ?? 'أخرى',
       subCategory:    d['subCategory']  ?? 'أخرى',
       region:         d['region']       ?? '',
       location:       d['location']     ?? '',
@@ -120,9 +120,9 @@ class PostModel {
     searchKeywords: searchKeywords,
   );
 
-  bool get isOffer   => type == PostType.offer;
-  bool get isRequest => type == PostType.request;
-  bool get isActive  => status == PostStatus.active;
+  bool get isOffer     => type == PostType.offer;
+  bool get isRequest   => type == PostType.request;
+  bool get isActive    => status == PostStatus.active;
 
   int get daysRemaining {
     final diff = expiresAt.toDate().difference(DateTime.now());
